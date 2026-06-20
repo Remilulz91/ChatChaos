@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0
+- Reworded the winner announcement (Twitch + in-game chat) to:
+  "Voting closed! Winner: {event} with {n} votes." / FR: "Vote terminé ! Gagnant :
+  {event} avec {n} votes."
+
 ## 0.3.0
 - Poll messages now also appear in the in-game text chat (landing, poll start +
   options, winner, takeoff), broadcast to every player in the lobby via the game's
