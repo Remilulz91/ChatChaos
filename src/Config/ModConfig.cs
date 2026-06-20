@@ -68,6 +68,12 @@ namespace ChatChaos.Config
         /// <summary>Prefix put in front of every chat message the mod posts.</summary>
         public static ConfigEntry<string> ChatPrefix = null!;
 
+        /// <summary>Also show poll messages in the in-game chat box (seen by all players).</summary>
+        public static ConfigEntry<bool> ShowInGameChat = null!;
+
+        /// <summary>HTML hex colour of the prefix in the in-game chat (e.g. F0A91E).</summary>
+        public static ConfigEntry<string> InGameChatColorHex = null!;
+
         // ---------------- Display ----------------
 
         /// <summary>Language: Auto (from the game), English or French.</summary>
@@ -138,6 +144,15 @@ namespace ChatChaos.Config
             ChatPrefix = cfg.Bind(
                 "Chat", "Prefix", "[ChatChaos]",
                 "Prefix added to every chat message the mod posts.");
+
+            ShowInGameChat = cfg.Bind(
+                "Chat", "ShowInGameChat", true,
+                "Also display poll messages (landing, start + options, winner, takeoff) in the " +
+                "in-game text chat, visible to every player in the lobby.");
+
+            InGameChatColorHex = cfg.Bind(
+                "Chat", "InGameChatColor", "F0A91E",
+                "HTML hex colour (no '#') of the mod prefix in the in-game chat. Default F0A91E (orange).");
 
             // -- Display --
             Language = cfg.Bind(

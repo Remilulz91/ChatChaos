@@ -25,6 +25,8 @@ Author: **Remilulz_91** — © 2026 Remilulz_91, all rights reserved.
   counts and a countdown, then the winner (in green) when voting ends.
 - **In chat too.** The mod posts the poll start, the options and the winner in your
   Twitch chat, under your own account.
+- **In the game chat as well.** The same poll messages appear in the in-game text chat,
+  visible to every player in the lobby (can be turned off in the config).
 - **Nobody voted?** Fate decides — the mod picks a random option.
 - **Multi-language.** The panel and chat messages are in **French** when the game is
   in French, **English** otherwise (override in the config).
@@ -84,6 +86,8 @@ All options live in `BepInEx/config/Remilulz_91.ChatChaos.cfg`:
 | Poll | `SkipCompanyMoon` | `true` | No polls on the safe Company moon. |
 | Chat | `AnnounceInChat` | `true` | Post poll messages in chat. |
 | Chat | `Prefix` | `[ChatChaos]` | Prefix on every posted message. |
+| Chat | `ShowInGameChat` | `true` | Also show poll messages in the in-game chat (all players). |
+| Chat | `InGameChatColor` | `F0A91E` | Hex colour of the prefix in the in-game chat. |
 | Display | `Language` | `Auto` | `Auto`, `English` or `French`. |
 | Display | `PanelAnchorX/Y` | `0.30 / 0.22` | Panel position (0–1 across the screen). |
 | Display | `PanelScale` | `1.0` | Panel size. |

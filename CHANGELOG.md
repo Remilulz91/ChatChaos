@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+- Poll messages now also appear in the in-game text chat (landing, poll start +
+  options, winner, takeoff), broadcast to every player in the lobby via the game's
+  own chat. The mod prefix is shown in colour (configurable).
+- New config options: `Chat/ShowInGameChat` (on by default) and
+  `Chat/InGameChatColor`. The "last call" reminder stays Twitch-only to avoid spam.
+
 ## 0.2.0
 - Chat announcement when the ship lands on a moon, with the moon's name and the
   countdown: "The ship has landed on {moon}. Voting starts in {delay} seconds."
