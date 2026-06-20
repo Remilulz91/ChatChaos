@@ -1,0 +1,87 @@
+using ChatChaos.UI;
+using HarmonyLib;
+using UnityEngine;
+
+namespace ChatChaos.Core
+{
+    /// <summary>
+    /// A tiny component, created once at startup, that:
+    ///   - makes sure the poll panel (PollHud) exists,
+    ///   - detects when the ship lands on / leaves a moon, and
+    ///   - calls PollManager.Tick() every frame.
+    ///
+    /// We watch the ship state here (instead of patching a specific game method) so
+    /// a game update that renames a method can't silently break the trigger; the
+    /// ship-landed flag is read defensively via reflection.
+    /// </summary>
+    public class PollTicker : MonoBehaviour
+    {
+        public static PollTicker? Instance { get; private set; }
+
+        private bool _prevLanded;
+
+        public static void EnsureExists()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("ChatChaos_Ticker");
+            Object.DontDestroyOnLoad(go);
+            go.hideFlags = HideFlags.HideAndDontSave;
+            Instance = go.AddComponent<PollTicker>();
+
+            PollHud.EnsureExists();
+        }
+
+        private void Update()
+        {
+            PollManager.Tick();
+            TrackLanding();
+        }
+
+        private void TrackLanding()
+        {
+            var sor = StartOfRound.Instance;
+            if (sor == null) { _prevLanded = false; return; }
+
+            bool landed = ReadLanded(sor);
+            if (landed && !_prevLanded)
+            {
+                _prevLanded = true;
+                PollManager.OnLanded(IsCompanyMoon(sor));
+            }
+            else if (!landed && _prevLanded)
+            {
+                _prevLanded = false;
+                PollManager.OnTookOff();
+            }
+        }
+
+        private static bool ReadLanded(StartOfRound sor)
+        {
+            // Try the known flags in order; reflection so a rename only disables the
+            // feature rather than breaking compilation/runtime.
+            foreach (var field in new[] { "shipHasLanded", "shipDoorsEnabled" })
+            {
+                try
+                {
+                    var v = Traverse.Create(sor).Field(field).GetValue();
+                    if (v is bool b) return b;
+                }
+                catch { /* try next */ }
+            }
+            return false;
+        }
+
+        private static bool IsCompanyMoon(StartOfRound sor)
+        {
+            try
+            {
+                var level = sor.currentLevel;
+                if (level == null) return false;
+                if (level.levelID == 3) return true; // Gordion / Company building
+                string name = (level.PlanetName ?? "").ToLowerInvariant();
+                return name.Contains("company") || name.Contains("gordion");
+            }
+            catch { return false; }
+        }
+    }
+}

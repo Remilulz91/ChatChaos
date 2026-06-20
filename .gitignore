@@ -1,0 +1,24 @@
+# Build
+bin/
+obj/
+*.user
+
+# IDE
+.vs/
+.idea/
+.vscode/
+
+# NuGet
+*.nupkg
+packages/
+
+# Thunderstore output
+*.zip
+dist/
+
+# Local secrets — NEVER commit a Twitch OAuth token.
+# BepInEx writes the per-user config (with the token) here at runtime; it must
+# never end up in the repo.
+BepInEx/config/Remilulz_91.ChatChaos.cfg
+*.secret
+secrets.*

@@ -1,0 +1,92 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    ChatChaos - csproj
+    ============================================================
+    This file describes HOW the mod is compiled into a .dll.
+
+    Key points:
+      - We target netstandard2.1 (required by BepInEx / Unity Mono).
+      - We do NOT reference Assembly-CSharp.dll manually: we use the NuGet
+        package "LethalCompany.GameLibs.Steam" which provides "stripped"
+        (lightweight) versions of the game DLLs, legal to redistribute.
+      - HarmonyX, BepInEx and Unity also come through NuGet.
+
+    To compile: open a terminal in this folder and run
+        dotnet build -c Release
+    The final .dll lands in bin/Release/ChatChaos.dll
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>ChatChaos</AssemblyName>
+    <Product>ChatChaos</Product>
+    <!-- Keep this number in sync with manifest.json and Plugin.cs -->
+    <Version>0.1.0</Version>
+    <LangVersion>latest</LangVersion>
+    <Nullable>annotations</Nullable>
+
+    <!-- The Netcode Patcher requires portable (not full) debug symbols, or it errors. -->
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+
+    <!-- Generate a netcode-patcher friendly build (see README, networking section) -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+
+    <!-- Enables public references to internal/private game members -->
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Modding framework -->
+    <PackageReference Include="BepInEx.Core" Version="5.*" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+
+    <!-- Game DLLs (stripped): provides Assembly-CSharp, Unity, Netcode, etc.
+         Replace the version with the one matching your game build.
+         See: https://www.nuget.org/packages/LethalCompany.GameLibs.Steam -->
+    <PackageReference Include="LethalCompany.GameLibs.Steam"
+                      Version="*-*"
+                      Publicize="true"
+                      PrivateAssets="all" />
+
+    <!--
+      Note: we do NOT reference UnityEngine.Modules directly. GameLibs.Steam already
+      pulls the matching Unity version. Pinning it here can cause a NU1605
+      package-downgrade error.
+    -->
+  </ItemGroup>
+
+  <!--
+    "Publicize=true" above makes the game's private fields/methods accessible
+    without reflection. That's what lets us read private game state directly.
+  -->
+
+  <!--
+    OPTIONAL build-time Netcode Patch.
+    Runs ONLY when you pass  -p:NetcodePatch=true  (the GitHub Actions workflow does).
+    A normal `dotnet build` stays patch-free so it never needs the CLI tool installed.
+    Requires the CLI:  dotnet tool install -g Evaisa.NetcodePatcher.Cli
+    Versions below must match the GAME (Lethal Company). Adjust if a game update changes them.
+  -->
+  <PropertyGroup>
+    <!-- Lethal Company v81 stack (Unity 2022.3.62, Netcode for GameObjects 1.12.2). -->
+    <NcpUnityVersion>2022.3.62</NcpUnityVersion>
+    <NcpNetcodeVersion>1.12.2</NcpNetcodeVersion>
+    <NcpTransportVersion>1.0.0</NcpTransportVersion>
+  </PropertyGroup>
+
+  <Target Name="NetcodePatch" AfterTargets="PostBuildEvent" Condition="'$(NetcodePatch)' == 'true'">
+    <PropertyGroup>
+      <NetcodePatcherDepsListFile>$(IntermediateOutputPath)ncp-deps.list</NetcodePatcherDepsListFile>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(NetcodePatcherDepsListFile)" Lines="@(ReferencePathWithRefAssemblies)" Overwrite="true" />
+    <Exec Command="netcode-patch -uv $(NcpUnityVersion) -nv $(NcpNetcodeVersion) -tv $(NcpTransportVersion) &quot;$(TargetPath)&quot; --dependency-file &quot;$(NetcodePatcherDepsListFile)&quot;" />
+  </Target>
+
+</Project>

@@ -1,0 +1,101 @@
+name: Build ChatChaos
+
+# Builds the mod on every push and pull request, netcode-patches the DLL, and
+# uploads it as a downloadable artifact. Pushing a tag like "v0.1.0" also creates
+# a GitHub Release with the ready-to-use DLL and a Thunderstore zip attached.
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ "v*" ]
+  pull_request:
+  workflow_dispatch:   # lets you run it manually from the Actions tab
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # required so the tag build can create a Release
+    env:
+      TS_TOKEN: ${{ secrets.TS_TOKEN }}   # exposed so the publish step can check it
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Install Netcode Patcher CLI
+        run: |
+          dotnet tool install -g Evaisa.NetcodePatcher.Cli
+          echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+
+      - name: Restore
+        run: dotnet restore
+
+      # -p:NetcodePatch=true makes the build also patch the DLL for multiplayer RPCs.
+      # If this step fails because of a game version change, see GITHUB_BUILD.md
+      # (adjust the Unity/Netcode versions, or build without patching and use the
+      # "Runtime Netcode Patcher" mod in-game instead).
+      - name: Build (Release, netcode-patched)
+        run: dotnet build -c Release -p:NetcodePatch=true
+
+      - name: Stage package
+        run: |
+          mkdir -p dist/ChatChaos
+          cp bin/Release/ChatChaos.dll dist/ChatChaos/
+          cp manifest.json icon.png README.md CHANGELOG.md LICENSE dist/ChatChaos/
+
+      - name: Upload DLL + package (artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChatChaos
+          path: dist/ChatChaos
+
+      - name: Zip for Thunderstore
+        run: |
+          cd dist/ChatChaos
+          zip -r ../../ChatChaos.zip .
+
+      - name: Attach to GitHub Release (on tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ChatChaos ${{ github.ref_name }}
+          body: |
+            **ChatChaos ${{ github.ref_name }}** by Remilulz_91
+
+            Download `ChatChaos.dll` below and drop it into
+            `BepInEx/plugins/ChatChaos/`. See the README for setup (including the
+            Twitch token).
+
+            `ChatChaos.zip` is the Thunderstore-style package (dll + manifest + icon + readme).
+          files: |
+            dist/ChatChaos/ChatChaos.dll
+            ChatChaos.zip
+
+      # ---- Publish to Thunderstore (only on a version tag) ----
+      # Requires a repo secret named TS_TOKEN (a Thunderstore service-account token).
+      # The version is the tag without the leading "v" (e.g. v0.3.0 -> 0.3.0).
+      - name: Version from tag
+        if: startsWith(github.ref, 'refs/tags/')
+        id: ver
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      # Only runs when a TS_TOKEN secret is set; otherwise it's skipped cleanly (so the
+      # build stays green and you can publish manually instead).
+      - name: Publish to Thunderstore (on tag)
+        if: startsWith(github.ref, 'refs/tags/') && env.TS_TOKEN != ''
+        uses: GreenTF/upload-thunderstore-package@v4.3
+        with:
+          community: lethal-company
+          namespace: Remilulz_91
+          name: ChatChaos
+          version: ${{ steps.ver.outputs.version }}
+          description: "Your Twitch chat votes live to unleash random events on the run. On-screen + in-chat polls; viewers type 1, 2 or 3. ALL players must install."
+          website: https://github.com/Remilulz91/ChatChaos
+          categories: tools
+          token: ${{ secrets.TS_TOKEN }}
+          file: ChatChaos.zip
