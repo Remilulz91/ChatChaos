@@ -29,7 +29,8 @@ namespace ChatChaos
         public const string Author = "Remilulz_91";
         public const string Guid = "Remilulz_91.ChatChaos";
         public const string Name = "ChatChaos";
-        public const string Version = "0.1.0";
+        public const string Version = "0.2.0";
+        // Inspired by Sehelitar's Twitch-integration mod (moderator for MrTiboute).
 
         /// <summary>Singleton instance, accessible anywhere via Plugin.Instance.</summary>
         public static Plugin Instance { get; private set; } = null!;
@@ -64,6 +65,7 @@ namespace ChatChaos
 
                 Log.LogInfo($"{Name} v{Version} by {Author} loaded. " +
                             $"{EventRegistry.Count} event(s) registered. Language: {Loc.Current}.");
+                Log.LogInfo("Inspired by Sehelitar's Twitch-integration mod (moderator for MrTiboute).");
             }
             catch (Exception e)
             {

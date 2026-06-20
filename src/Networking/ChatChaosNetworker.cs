@@ -86,6 +86,13 @@ namespace ChatChaos.Networking
             Safe(() => HideClientRpc());
         }
 
+        public void BroadcastTip(string header, string body)
+        {
+            if (!IsServer) return;
+            GameTips.Show(header, body);
+            Safe(() => TipClientRpc(header, body));
+        }
+
         [ClientRpc]
         private void StartPollClientRpc(string l0, string l1, string l2, float duration)
         {
@@ -112,6 +119,13 @@ namespace ChatChaos.Networking
         {
             if (IsServer) return;
             PollHud.Instance?.Hide();
+        }
+
+        [ClientRpc]
+        private void TipClientRpc(string header, string body)
+        {
+            if (IsServer) return;
+            GameTips.Show(header, body);
         }
     }
 }

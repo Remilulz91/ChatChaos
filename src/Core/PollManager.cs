@@ -26,6 +26,7 @@ namespace ChatChaos.Core
 
         private static Phase _phase = Phase.Idle;
         private static bool _landed;
+        private static bool _pollsThisMoon;
 
         private static float _nextPollTime;
         private static float _pollEndTime;
@@ -50,8 +51,8 @@ namespace ChatChaos.Core
             TwitchClient.StartFromConfig();
         }
 
-        /// <summary>Ship just landed on a moon (host only).</summary>
-        public static void OnLanded(bool isCompanyMoon)
+        /// <summary>Ship just landed on a moon (host only does the work).</summary>
+        public static void OnLanded(bool isCompanyMoon, string moonName)
         {
             _landed = true;
             if (!IsHost) return;
@@ -59,25 +60,42 @@ namespace ChatChaos.Core
             if (isCompanyMoon && ModConfig.SkipCompanyMoon.Value)
             {
                 Plugin.Log.LogInfo("ChatChaos: safe moon — no polls here.");
+                _pollsThisMoon = false;
                 _phase = Phase.Idle;
                 return;
             }
             if (EventRegistry.Count == 0)
             {
                 Plugin.Log.LogWarning("ChatChaos: no events registered — cannot run a poll.");
+                _pollsThisMoon = false;
                 _phase = Phase.Idle;
                 return;
             }
 
-            _nextPollTime = Time.time + Mathf.Max(0f, ModConfig.PollDelayAfterLanding.Value);
+            int delay = Mathf.RoundToInt(Mathf.Max(0f, ModConfig.PollDelayAfterLanding.Value));
+            string moon = string.IsNullOrWhiteSpace(moonName) ? "?" : moonName.Trim();
+
+            _pollsThisMoon = true;
+            _nextPollTime = Time.time + delay;
             _phase = Phase.Scheduled;
-            Plugin.Log.LogInfo($"ChatChaos: first poll scheduled in {ModConfig.PollDelayAfterLanding.Value:0}s.");
+
+            // Chat + on-screen confirmation (also a live "is the sync working?" check).
+            Announce(Loc.Format("chat.landed", moon, delay));
+            ShowTip(Loc.Get("tip.header"), Loc.Format("tip.landed", moon, delay));
+
+            Plugin.Log.LogInfo($"ChatChaos: landed on '{moon}', first poll in {delay}s.");
         }
 
-        /// <summary>Ship left the moon (host only) — cancel everything.</summary>
+        /// <summary>Ship left the moon — announce, then cancel everything.</summary>
         public static void OnTookOff()
         {
             _landed = false;
+
+            // Only the host posts in chat, and only if polls were active on this moon.
+            if (IsHost && _pollsThisMoon)
+                Announce(Loc.Get("chat.takeoff"));
+            _pollsThisMoon = false;
+
             if (_phase != Phase.Idle)
             {
                 _phase = Phase.Idle;
@@ -264,6 +282,13 @@ namespace ChatChaos.Core
             var n = ChatChaosNetworker.Active;
             if (n != null) n.BroadcastHide();
             else PollHud.Instance?.Hide();
+        }
+
+        private static void ShowTip(string header, string body)
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null) n.BroadcastTip(header, body);
+            else GameTips.Show(header, body);
         }
     }
 }

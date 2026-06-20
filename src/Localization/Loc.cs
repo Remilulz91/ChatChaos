@@ -65,6 +65,10 @@ namespace ChatChaos.Localization
                 ["chat.ending"]        = "Last call! Voting closes in {0}s.",
                 ["chat.winner"]        = "Voting closed! Winner: {0} ({1} votes).",
                 ["chat.winner.novote"] = "Nobody voted, so fate decides: {0}!",
+                ["chat.landed"]        = "The ship has landed on {0}. Voting starts in {1} seconds.",
+                ["chat.takeoff"]       = "The ship has taken off. Polls are interrupted.",
+                ["tip.header"]         = "ChatChaos - Twitch active",
+                ["tip.landed"]         = "Landed on {0}. Automatic polls active: first vote in {1}s.",
             };
 
             _strings[Lang.French] = new Dictionary<string, string>
@@ -77,6 +81,10 @@ namespace ChatChaos.Localization
                 ["chat.ending"]        = "Derniers instants ! Le vote se termine dans {0}s.",
                 ["chat.winner"]        = "Vote terminé ! Gagnant : {0} ({1} votes).",
                 ["chat.winner.novote"] = "Personne n'a voté, le sort décide : {0} !",
+                ["chat.landed"]        = "Le vaisseau vient d'atterrir sur {0}. Les votes démarreront dans {1} secondes.",
+                ["chat.takeoff"]       = "Le vaisseau vient de décoller. Les sondages sont interrompus.",
+                ["tip.header"]         = "ChatChaos - Twitch activé",
+                ["tip.landed"]         = "Atterrissage sur {0}. Sondages automatiques actifs : premier vote dans {1}s.",
             };
         }
     }

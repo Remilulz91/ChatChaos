@@ -46,7 +46,7 @@ namespace ChatChaos.Core
             if (landed && !_prevLanded)
             {
                 _prevLanded = true;
-                PollManager.OnLanded(IsCompanyMoon(sor));
+                PollManager.OnLanded(IsCompanyMoon(sor), MoonName(sor));
             }
             else if (!landed && _prevLanded)
             {
@@ -69,6 +69,12 @@ namespace ChatChaos.Core
                 catch { /* try next */ }
             }
             return false;
+        }
+
+        private static string MoonName(StartOfRound sor)
+        {
+            try { return sor.currentLevel?.PlanetName ?? ""; }
+            catch { return ""; }
         }
 
         private static bool IsCompanyMoon(StartOfRound sor)

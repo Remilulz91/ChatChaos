@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0
+- Chat announcement when the ship lands on a moon, with the moon's name and the
+  countdown: "The ship has landed on {moon}. Voting starts in {delay} seconds."
+- Chat announcement when the ship takes off: "The ship has taken off. Polls are
+  interrupted." (only after a moon where polls were active).
+- On-screen game tip on landing (the native bottom-left note), shown to all players,
+  confirming the integration is live and synced.
+- Credit added for Sehelitar's Twitch-integration mod (moderator for MrTiboute), the
+  inspiration for this mod.
+
 ## 0.1.0
 - Initial version: foundations of the Twitch-driven poll system.
 - A poll opens 45 s after landing on any moon except the safe Company building;

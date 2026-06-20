@@ -108,6 +108,13 @@ Make sure **every player in the lobby** has the mod, same version.
 
 ---
 
+## Credits
+
+Inspired by **Sehelitar**'s Twitch-integration mod (moderator for **MrTiboute**), which
+gave me the idea and the design direction for this mod. Thanks!
+
+---
+
 ## License & Copyright
 
 © 2026 **Remilulz_91**. All rights reserved.
