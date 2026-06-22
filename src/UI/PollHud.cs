@@ -29,6 +29,7 @@ namespace ChatChaos.UI
         private static readonly Color BarLeading    = new Color32(252, 196, 70, 255);
         private static readonly Color BarWinner     = new Color32(95, 190, 70, 255);
         private static readonly Color RowText        = new Color32(238, 238, 238, 255);
+        private static readonly Color AlarmRed       = new Color32(214, 48, 40, 255);
 
         private const int PanelWidth = 470;
         private const int PanelHeight = 232;
@@ -54,6 +55,7 @@ namespace ChatChaos.UI
         private RectTransform _panel = null!;
         private Text _title = null!;
         private Text _timer = null!;
+        private Image _clockIcon = null!;
         private Text _instruction = null!;
         private Sprite _white = null!;
 
@@ -96,6 +98,9 @@ namespace ChatChaos.UI
             _instruction.text = Loc.Get("panel.instruction");
             _instruction.color = HeaderText;
 
+            if (_clockIcon != null) _clockIcon.gameObject.SetActive(true);
+            ApplyTimerVisual(1f, HeaderText);
+
             SetVisible(true);
             Refresh();
         }
@@ -133,6 +138,10 @@ namespace ChatChaos.UI
             _autoHideTime = Time.time + Mathf.Max(1f, ModConfig.ResultDisplayDuration.Value);
             _active = true;
 
+            // The result view has no countdown: hide the clock and reset the pulse.
+            if (_clockIcon != null) _clockIcon.gameObject.SetActive(false);
+            ApplyTimerVisual(1f, HeaderText);
+
             SetVisible(true);
             Refresh();
         }
@@ -143,6 +152,8 @@ namespace ChatChaos.UI
             _finished = false;
             _paused = false;
             _autoHideTime = float.MaxValue;
+            if (_clockIcon != null) _clockIcon.gameObject.SetActive(false);
+            ApplyTimerVisual(1f, HeaderText);
             SetVisible(false);
         }
 
@@ -162,8 +173,10 @@ namespace ChatChaos.UI
 
             if (!_finished)
             {
-                int secs = Mathf.Max(0, Mathf.CeilToInt(_endTime - Time.time));
+                float remaining = _endTime - Time.time;
+                int secs = Mathf.Max(0, Mathf.CeilToInt(remaining));
                 _timer.text = secs + "s";
+                UpdateTimerPulse(remaining);
             }
             else
             {
@@ -171,6 +184,37 @@ namespace ChatChaos.UI
                 // Result view clears itself after ResultDisplayDuration (set in ShowResult),
                 // so the panel always disappears completely on its own.
                 if (Time.time >= _autoHideTime) Hide();
+            }
+        }
+
+        /// <summary>
+        /// During the last 10 seconds, the number and the clock icon "beat" once per
+        /// second: they grow and turn red at the peak, then shrink back to normal size
+        /// and black at the edges of each second. Above 10s they stay black and normal.
+        /// </summary>
+        private void UpdateTimerPulse(float remaining)
+        {
+            if (remaining <= 10f && remaining > 0f)
+            {
+                float intoSecond = Mathf.Ceil(remaining) - remaining; // 0..1 across the shown second
+                float p = Mathf.Sin(intoSecond * Mathf.PI);           // 0 at the edges, 1 mid-second
+                ApplyTimerVisual(Mathf.Lerp(1f, 1.6f, p), Color.Lerp(HeaderText, AlarmRed, p));
+            }
+            else
+            {
+                ApplyTimerVisual(1f, HeaderText);
+            }
+        }
+
+        private void ApplyTimerVisual(float scale, Color color)
+        {
+            var s = new Vector3(scale, scale, 1f);
+            _timer.rectTransform.localScale = s;
+            _timer.color = color;
+            if (_clockIcon != null)
+            {
+                _clockIcon.rectTransform.localScale = s;
+                _clockIcon.color = color;
             }
         }
 
@@ -247,9 +291,22 @@ namespace ChatChaos.UI
             _title = NewText(_panel, "Title", ">SONDAGE", 30, TextAnchor.UpperLeft, HeaderText, FontStyle.Bold);
             Place(_title.rectTransform, Pad, Pad, PanelWidth - Pad * 2, 36);
 
-            // Timer (top-right).
-            _timer = NewText(_panel, "Timer", "", 26, TextAnchor.UpperRight, HeaderText, FontStyle.Bold);
-            Place(_timer.rectTransform, Pad, Pad, PanelWidth - Pad * 2, 34);
+            // Timer (top-right): a drawn clock icon + the seconds number. Both pulse
+            // (scale + colour) during the last 10 seconds.
+            _clockIcon = NewImage(_panel, "ClockIcon", HeaderText);
+            _clockIcon.sprite = MakeClockSprite();
+            var crt = (RectTransform)_clockIcon.transform;
+            crt.anchorMin = crt.anchorMax = new Vector2(1, 1);
+            crt.pivot = new Vector2(1, 0.5f);
+            crt.sizeDelta = new Vector2(26, 26);
+            crt.anchoredPosition = new Vector2(-(Pad + 60), -(Pad + 18));
+
+            _timer = NewText(_panel, "Timer", "", 26, TextAnchor.MiddleRight, HeaderText, FontStyle.Bold);
+            var trt = _timer.rectTransform;
+            trt.anchorMin = trt.anchorMax = new Vector2(1, 1);
+            trt.pivot = new Vector2(1, 0.5f);
+            trt.sizeDelta = new Vector2(58, 34);
+            trt.anchoredPosition = new Vector2(-Pad, -(Pad + 18));
 
             // Instruction line.
             _instruction = NewText(_panel, "Instruction", "", 18, TextAnchor.UpperLeft, HeaderText, FontStyle.Normal);
@@ -352,6 +409,64 @@ namespace ChatChaos.UI
         {
             var tex = Texture2D.whiteTexture;
             return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        /// <summary>
+        /// Draws a simple stopwatch icon (ring + top button + two hands) into a texture
+        /// at runtime. White on transparent, so it can be tinted via Image.color (black
+        /// normally, red on the pulse).
+        /// </summary>
+        private static Sprite MakeClockSprite()
+        {
+            const int S = 64;
+            var tex = new Texture2D(S, S, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+            var px = new Color32[S * S];
+            for (int i = 0; i < px.Length; i++) px[i] = new Color32(255, 255, 255, 0);
+
+            float cx = 31.5f, cy = 28f, R = 21f, thick = 4.5f;
+            var on = new Color32(255, 255, 255, 255);
+
+            void Set(int x, int y) { if (x >= 0 && x < S && y >= 0 && y < S) px[y * S + x] = on; }
+
+            void Line(float x0, float y0, float x1, float y1, float w)
+            {
+                float steps = Mathf.Max(Mathf.Abs(x1 - x0), Mathf.Abs(y1 - y0)) * 2f + 1f;
+                int hw = Mathf.CeilToInt(w / 2f);
+                for (int s = 0; s <= steps; s++)
+                {
+                    float t = s / steps;
+                    int x = Mathf.RoundToInt(Mathf.Lerp(x0, x1, t));
+                    int y = Mathf.RoundToInt(Mathf.Lerp(y0, y1, t));
+                    for (int oy = -hw; oy <= hw; oy++)
+                        for (int ox = -hw; ox <= hw; ox++) Set(x + ox, y + oy);
+                }
+            }
+
+            void Rect(int x0, int x1, int y0, int y1)
+            {
+                for (int y = y0; y <= y1; y++) for (int x = x0; x <= x1; x++) Set(x, y);
+            }
+
+            // Ring (clock body).
+            for (int y = 0; y < S; y++)
+                for (int x = 0; x < S; x++)
+                {
+                    float dx = x - cx, dy = y - cy, d = Mathf.Sqrt(dx * dx + dy * dy);
+                    if (d <= R && d >= R - thick) Set(x, y);
+                }
+
+            // Stopwatch top button (stem + cap) above the ring.
+            Rect((int)cx - 2, (int)cx + 1, (int)(cy + R), (int)(cy + R) + 4);
+            Rect((int)cx - 4, (int)cx + 3, (int)(cy + R) + 4, (int)(cy + R) + 6);
+
+            // Hands: one up, one up-right, plus a small centre hub.
+            Line(cx, cy, cx, cy + R * 0.55f, 2.2f);
+            Line(cx, cy, cx + R * 0.62f, cy + R * 0.20f, 2.2f);
+            Line(cx, cy, cx, cy, 3f);
+
+            tex.SetPixels32(px);
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, S, S), new Vector2(0.5f, 0.5f), 100f);
         }
     }
 }

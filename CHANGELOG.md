@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0
+- Countdown number is black normally. In the last 10 seconds it pulses once per second:
+  it grows and turns red at each beat, then shrinks back to normal size and black, until
+  zero (then it switches to the winner).
+- Added a drawn clock/stopwatch icon next to the number; it pulses (scale + colour) in
+  sync with the number.
+
 ## 0.7.0
 - If the ship leaves the moon during a poll, the poll is now CANCELLED: the panel
   freezes (countdown and vote counts stop), stays on screen for the result duration
