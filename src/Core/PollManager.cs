@@ -34,6 +34,7 @@ namespace ChatChaos.Core
         private static float _lastCountsBroadcast;
         private static bool _endingAnnounced;
         private static bool _connTipShown;
+        private static bool _clientNoticeDone;
 
         private static List<ChatEvent> _options = new();
         private static int[] _counts = new int[3];
@@ -53,6 +54,45 @@ namespace ChatChaos.Core
             TwitchClient.StartFromConfig();
         }
 
+        /// <summary>True if at least one chat source (Twitch; YouTube later) is connected.</summary>
+        private static bool IsAccountConnected()
+        {
+            var tw = TwitchClient.Instance;
+            return tw != null && tw.IsConnected;
+        }
+
+        /// <summary>
+        /// Client-side one-time notice: if a NON-host player configured an account, tell
+        /// them it is ignored (only the host's chat drives the votes). Local tip + log;
+        /// called every frame from the ticker but acts once per session. Runs for everyone.
+        /// </summary>
+        public static void TickClientNotice()
+        {
+            var nm = NetworkManager.Singleton;
+            if (nm == null || !nm.IsConnectedClient)
+            {
+                _clientNoticeDone = false;   // reset for the next session
+                return;
+            }
+            if (_clientNoticeDone) return;
+
+            if (nm.IsHost || nm.IsServer) { _clientNoticeDone = true; return; }  // host: no notice
+            if (!ClientHasConfiguredAccount()) { _clientNoticeDone = true; return; }
+            if (HUDManager.Instance == null) return;   // wait until the HUD exists
+
+            _clientNoticeDone = true;
+            Plugin.Log.LogInfo("ChatChaos: you are not the host — your account is ignored. " +
+                               "Only the host's chat drives the votes.");
+            GameTips.Show(Loc.Get("tip.client.header"), Loc.Get("tip.client.body"));
+        }
+
+        private static bool ClientHasConfiguredAccount()
+        {
+            if (!ModConfig.TwitchEnabled.Value) return false;
+            return !string.IsNullOrWhiteSpace(ModConfig.TwitchChannel.Value)
+                || !string.IsNullOrWhiteSpace(ModConfig.TwitchOAuthToken.Value);
+        }
+
         /// <summary>Ship just landed on a moon (host only does the work).</summary>
         public static void OnLanded(bool isCompanyMoon, string moonName)
         {
@@ -69,6 +109,14 @@ namespace ChatChaos.Core
             if (EventRegistry.Count == 0)
             {
                 Plugin.Log.LogWarning("ChatChaos: no events registered — cannot run a poll.");
+                _pollsThisMoon = false;
+                _phase = Phase.Idle;
+                return;
+            }
+            if (ModConfig.RequireConnectedAccount.Value && !IsAccountConnected())
+            {
+                Plugin.Log.LogInfo("ChatChaos: no chat account connected — no poll this landing " +
+                                   "(RequireConnectedAccount is on).");
                 _pollsThisMoon = false;
                 _phase = Phase.Idle;
                 return;

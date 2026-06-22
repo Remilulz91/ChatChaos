@@ -84,6 +84,7 @@ All options live in `BepInEx/config/Remilulz_91.ChatChaos.cfg`:
 | Poll | `RepeatInterval` | `0` | Seconds between polls on the same moon. `0` = one poll per landing. |
 | Poll | `ResultDisplayDuration` | `6` | How long the winner panel stays up. |
 | Poll | `SkipCompanyMoon` | `true` | No polls on the safe Company moon. |
+| Poll | `RequireConnectedAccount` | `false` | If on, polls only run when a chat account is connected. |
 | Chat | `AnnounceInChat` | `true` | Post poll messages in chat. |
 | Chat | `Prefix` | `[ChatChaos]` | Prefix on every posted message. |
 | Chat | `ShowInGameChat` | `true` | Also show poll messages in the in-game chat (all players). |

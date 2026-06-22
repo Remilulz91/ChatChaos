@@ -290,11 +290,11 @@ namespace ChatChaos.UI
             // (scale + colour) during the last 10 seconds.
             _clockIcon = NewImage(_panel, "ClockIcon", HeaderText);
             _clockIcon.sprite = MakeClockSprite();
-            var crt = (RectTransform)_clockIcon.transform;
-            crt.anchorMin = crt.anchorMax = new Vector2(1, 1);
-            crt.pivot = new Vector2(1, 0.5f);
-            crt.sizeDelta = new Vector2(26, 26);
-            crt.anchoredPosition = new Vector2(-(Pad + 60), -(Pad + 18));
+            var iconRt = (RectTransform)_clockIcon.transform;
+            iconRt.anchorMin = iconRt.anchorMax = new Vector2(1, 1);
+            iconRt.pivot = new Vector2(1, 0.5f);
+            iconRt.sizeDelta = new Vector2(26, 26);
+            iconRt.anchoredPosition = new Vector2(-(Pad + 60), -(Pad + 18));
 
             _timer = NewText(_panel, "Timer", "", 26, TextAnchor.MiddleRight, HeaderText, FontStyle.Bold);
             var trt = _timer.rectTransform;
@@ -437,7 +437,7 @@ namespace ChatChaos.UI
                 }
             }
 
-            void Rect(int x0, int x1, int y0, int y1)
+            void FillRect(int x0, int x1, int y0, int y1)
             {
                 for (int y = y0; y <= y1; y++) for (int x = x0; x <= x1; x++) Set(x, y);
             }
@@ -451,8 +451,8 @@ namespace ChatChaos.UI
                 }
 
             // Stopwatch top button (stem + cap) above the ring.
-            Rect((int)cx - 2, (int)cx + 1, (int)(cy + R), (int)(cy + R) + 4);
-            Rect((int)cx - 4, (int)cx + 3, (int)(cy + R) + 4, (int)(cy + R) + 6);
+            FillRect((int)cx - 2, (int)cx + 1, (int)(cy + R), (int)(cy + R) + 4);
+            FillRect((int)cx - 4, (int)cx + 3, (int)(cy + R) + 4, (int)(cy + R) + 6);
 
             // Hands: one up, one up-right, plus a small centre hub.
             Line(cx, cy, cx, cy + R * 0.55f, 2.2f);

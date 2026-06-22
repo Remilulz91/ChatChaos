@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.10.0
+- Fixed the build error (duplicate local variable name in the HUD).
+- Non-host players who configured an account now get a one-time on-screen notice (and a
+  log line) telling them their account is ignored — only the host's chat drives the votes.
+- New config option Poll/RequireConnectedAccount (default false): when on, polls only run
+  if a chat account is connected; otherwise no poll is started (instead of running a poll
+  with a random outcome).
+
 ## 0.9.0
 - Voting bars now all use the same orange (the leading option is no longer highlighted
   with a brighter shade), matching the reference look.

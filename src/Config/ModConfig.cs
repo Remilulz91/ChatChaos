@@ -60,6 +60,9 @@ namespace ChatChaos.Config
         /// <summary>Skip polls on the free "safe" moon (the Company building).</summary>
         public static ConfigEntry<bool> SkipCompanyMoon = null!;
 
+        /// <summary>Only run polls when a chat account is actually connected.</summary>
+        public static ConfigEntry<bool> RequireConnectedAccount = null!;
+
         // ---------------- Chat messages ----------------
 
         /// <summary>Post poll announcements (start, options, winner) in chat.</summary>
@@ -135,6 +138,12 @@ namespace ChatChaos.Config
             SkipCompanyMoon = cfg.Bind(
                 "Poll", "SkipCompanyMoon", true,
                 "Do not run polls on the free 'safe' moon (the Company building).");
+
+            RequireConnectedAccount = cfg.Bind(
+                "Poll", "RequireConnectedAccount", false,
+                "If true, polls only run when a chat account (Twitch) is connected. When no " +
+                "account is connected, no poll is started at all (instead of running polls " +
+                "with a random outcome). Default false.");
 
             // -- Chat --
             AnnounceInChat = cfg.Bind(

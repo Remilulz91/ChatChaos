@@ -70,6 +70,8 @@ namespace ChatChaos.Localization
                 ["tip.connected.header"]   = "ChatChaos - Twitch",
                 ["tip.connected.body"]     = "Connected as {0}.",
                 ["tip.connected.readonly"] = "Connected in read-only mode (no token: votes count, no chat posts).",
+                ["tip.client.header"]      = "ChatChaos",
+                ["tip.client.body"]        = "You are not the host: your account is ignored. Only the host's chat drives the votes.",
                 ["tip.header"]             = "ChatChaos - Twitch active",
                 ["tip.landed"]             = "Automatic polls are now active. Landed on {0}: first vote in {1}s.",
             };
@@ -89,6 +91,8 @@ namespace ChatChaos.Localization
                 ["tip.connected.header"]   = "ChatChaos - Twitch",
                 ["tip.connected.body"]     = "Connecté en tant que {0}.",
                 ["tip.connected.readonly"] = "Connecté en lecture seule (sans jeton : les votes comptent, pas d'envoi dans le chat).",
+                ["tip.client.header"]      = "ChatChaos",
+                ["tip.client.body"]        = "Tu n'es pas l'hôte : ton compte est ignoré. Seul le chat de l'hôte pilote les votes.",
                 ["tip.header"]             = "ChatChaos - Twitch activé",
                 ["tip.landed"]             = "Les sondages automatiques sont activés. Atterrissage sur {0} : premier vote dans {1}s.",
             };

@@ -29,7 +29,7 @@ namespace ChatChaos
         public const string Author = "Remilulz_91";
         public const string Guid = "Remilulz_91.ChatChaos";
         public const string Name = "ChatChaos";
-        public const string Version = "0.9.0";
+        public const string Version = "0.10.0";
         // Inspired by Sehelitar's Twitch-integration mod (moderator for MrTiboute).
 
         /// <summary>Singleton instance, accessible anywhere via Plugin.Instance.</summary>

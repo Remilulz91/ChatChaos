@@ -34,6 +34,7 @@ namespace ChatChaos.Core
         private void Update()
         {
             PollManager.Tick();
+            PollManager.TickClientNotice();
             TrackLanding();
         }
 
