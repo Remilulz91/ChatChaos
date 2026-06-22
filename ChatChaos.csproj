@@ -22,7 +22,7 @@
     <AssemblyName>ChatChaos</AssemblyName>
     <Product>ChatChaos</Product>
     <!-- Keep this number in sync with manifest.json and Plugin.cs -->
-    <Version>0.8.0</Version>
+    <Version>0.9.0</Version>
     <LangVersion>latest</LangVersion>
     <Nullable>annotations</Nullable>
 

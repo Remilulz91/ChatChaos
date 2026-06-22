@@ -26,7 +26,6 @@ namespace ChatChaos.UI
         private static readonly Color HeaderText   = new Color32(38, 28, 16, 255);
         private static readonly Color RowEmpty      = new Color32(43, 43, 46, 255);
         private static readonly Color BarOrange     = new Color32(240, 168, 30, 255);
-        private static readonly Color BarLeading    = new Color32(252, 196, 70, 255);
         private static readonly Color BarWinner     = new Color32(95, 190, 70, 255);
         private static readonly Color RowText        = new Color32(238, 238, 238, 255);
         private static readonly Color AlarmRed       = new Color32(214, 48, 40, 255);
@@ -225,12 +224,6 @@ namespace ChatChaos.UI
             int max = 1;
             for (int i = 0; i < _rowsUsed; i++) max = Mathf.Max(max, _counts[i]);
 
-            // Which row currently leads (for the brighter highlight while voting).
-            int leader = -1, leadVal = -1;
-            for (int i = 0; i < _rowsUsed; i++)
-                if (_counts[i] > leadVal) { leadVal = _counts[i]; leader = i; }
-            if (leadVal <= 0) leader = -1;
-
             for (int i = 0; i < MaxRows; i++)
             {
                 bool used = i < _rowsUsed;
@@ -246,7 +239,9 @@ namespace ChatChaos.UI
                 var fillRt = (RectTransform)_rowFill[i].transform;
                 fillRt.sizeDelta = new Vector2(innerWidth * frac, RowHeight);
 
-                Color fillColor = isWinner ? BarWinner : (i == leader ? BarLeading : BarOrange);
+                // Uniform orange for every voting bar (leader no longer highlighted);
+                // green only for the winner on the result screen.
+                Color fillColor = isWinner ? BarWinner : BarOrange;
                 _rowFill[i].color = fillColor;
                 _rowFill[i].gameObject.SetActive(isWinner || _counts[i] > 0);
 

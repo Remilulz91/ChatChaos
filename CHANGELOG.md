@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.0
+- Voting bars now all use the same orange (the leading option is no longer highlighted
+  with a brighter shade), matching the reference look.
+
 ## 0.8.0
 - Countdown number is black normally. In the last 10 seconds it pulses once per second:
   it grows and turns red at each beat, then shrinks back to normal size and black, until
