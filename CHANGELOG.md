@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0
+- New on-screen tip when the Twitch connection is established (shown to all players):
+  "ChatChaos - Twitch / Connected as {user}." (read-only variant when no token is set).
+- Reworded the landing tip to mix the previous wording with the moon + countdown:
+  "ChatChaos - Twitch active / Automatic polls are now active. Landed on {moon}:
+  first vote in {delay}s."
+
 ## 0.4.0
 - Reworded the winner announcement (Twitch + in-game chat) to:
   "Voting closed! Winner: {event} with {n} votes." / FR: "Vote terminé ! Gagnant :

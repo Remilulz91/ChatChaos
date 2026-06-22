@@ -33,6 +33,7 @@ namespace ChatChaos.Core
         private static float _resultEndTime;
         private static float _lastCountsBroadcast;
         private static bool _endingAnnounced;
+        private static bool _connTipShown;
 
         private static List<ChatEvent> _options = new();
         private static int[] _counts = new int[3];
@@ -48,6 +49,7 @@ namespace ChatChaos.Core
         public static void OnHostReady()
         {
             if (!IsHost) return;
+            _connTipShown = false;          // re-show the "connected" tip for this session
             TwitchClient.StartFromConfig();
         }
 
@@ -109,6 +111,7 @@ namespace ChatChaos.Core
         {
             if (!IsHost) return;
 
+            ShowConnectionTipOnce();
             DrainVotes();
 
             switch (_phase)
@@ -152,6 +155,25 @@ namespace ChatChaos.Core
         }
 
         // ----------------------------------------------------------------- internals
+
+        /// <summary>
+        /// Once the Twitch connection is up, show the "connected as {user}" tip on
+        /// screen (synced to all players), like the moment you join a game. Shown once
+        /// per session; reset in OnHostReady.
+        /// </summary>
+        private static void ShowConnectionTipOnce()
+        {
+            if (_connTipShown || !ModConfig.TwitchEnabled.Value) return;
+
+            var tw = TwitchClient.Instance;
+            if (tw == null || !tw.IsConnected) return;
+
+            _connTipShown = true;
+            string body = tw.CanPost
+                ? Loc.Format("tip.connected.body", ModConfig.EffectiveUsername())
+                : Loc.Get("tip.connected.readonly");
+            ShowTip(Loc.Get("tip.connected.header"), body);
+        }
 
         private static void StartPoll()
         {
