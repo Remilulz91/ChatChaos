@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0
+- If the ship leaves the moon during a poll, the poll is now CANCELLED: the panel
+  freezes (countdown and vote counts stop), stays on screen for the result duration
+  (10s), then disappears completely. No winner is chosen and no event is applied.
+- Polls that were only scheduled (still in the 45s delay) are dropped silently on
+  takeoff. A poll already showing its winner keeps its normal 10s display.
+
 ## 0.6.0
 - Fixed the poll panel sometimes staying stuck on screen after the result: the panel
   now hides itself with an internal timer (independent of the network), so it always

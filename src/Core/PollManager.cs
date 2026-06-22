@@ -22,7 +22,7 @@ namespace ChatChaos.Core
     /// </summary>
     public static class PollManager
     {
-        private enum Phase { Idle, Scheduled, Voting, Result }
+        private enum Phase { Idle, Scheduled, Voting, Result, Cancelled }
 
         private static Phase _phase = Phase.Idle;
         private static bool _landed;
@@ -88,20 +88,37 @@ namespace ChatChaos.Core
             Plugin.Log.LogInfo($"ChatChaos: landed on '{moon}', first poll in {delay}s.");
         }
 
-        /// <summary>Ship left the moon — announce, then cancel everything.</summary>
+        /// <summary>Ship left the moon — announce, then cancel the current poll.</summary>
         public static void OnTookOff()
         {
             _landed = false;
+            if (!IsHost) return;   // clients update their HUD from the host's messages
 
-            // Only the host posts in chat, and only if polls were active on this moon.
-            if (IsHost && _pollsThisMoon)
+            if (_pollsThisMoon)
                 Announce(Loc.Get("chat.takeoff"));
             _pollsThisMoon = false;
 
-            if (_phase != Phase.Idle)
+            switch (_phase)
             {
-                _phase = Phase.Idle;
-                UiHide();
+                case Phase.Voting:
+                    // Freeze the poll panel (counter + counts) and keep it on screen, then
+                    // clear it after the result duration. The poll is CANCELLED: no winner
+                    // is chosen and no event is applied.
+                    UiPause();
+                    _resultEndTime = Time.time + Mathf.Max(1f, ModConfig.ResultDisplayDuration.Value);
+                    _phase = Phase.Cancelled;
+                    Plugin.Log.LogInfo("ChatChaos: ship left mid-poll — poll cancelled (frozen, no effect).");
+                    break;
+
+                case Phase.Scheduled:
+                    _phase = Phase.Idle;   // poll not shown yet, nothing to freeze
+                    break;
+
+                case Phase.Result:
+                    // Winner already shown (and applied): let its own timer clear it.
+                    break;
+
+                // Cancelled / Idle: nothing to do.
             }
         }
 
@@ -149,6 +166,15 @@ namespace ChatChaos.Core
                             _phase = Phase.Scheduled;
                         }
                         else _phase = Phase.Idle;
+                    }
+                    break;
+
+                case Phase.Cancelled:
+                    // Poll was cancelled by takeoff: clear the frozen panel after the delay.
+                    if (Time.time >= _resultEndTime)
+                    {
+                        UiHide();
+                        _phase = Phase.Idle;
                     }
                     break;
             }
@@ -327,6 +353,13 @@ namespace ChatChaos.Core
             var n = ChatChaosNetworker.Active;
             if (n != null) n.BroadcastHide();
             else PollHud.Instance?.Hide();
+        }
+
+        private static void UiPause()
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null) n.BroadcastPause();
+            else PollHud.Instance?.Pause();
         }
 
         private static void ShowTip(string header, string body)

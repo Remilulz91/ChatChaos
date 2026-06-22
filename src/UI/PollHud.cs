@@ -40,6 +40,7 @@ namespace ChatChaos.UI
         // ---- state ----
         private bool _active;
         private bool _finished;
+        private bool _paused;
         private readonly string[] _labels = new string[MaxRows];
         private readonly int[] _counts = new int[MaxRows];
         private int _rowsUsed;
@@ -85,6 +86,7 @@ namespace ChatChaos.UI
             for (int i = 0; i < MaxRows; i++) { _counts[i] = 0; if (_labels[i].Length > 0) _rowsUsed = i + 1; }
 
             _finished = false;
+            _paused = false;
             _winnerIndex = -1;
             _endTime = Time.time + duration;
             _autoHideTime = float.MaxValue;   // the voting panel never auto-hides
@@ -100,13 +102,28 @@ namespace ChatChaos.UI
 
         public void UpdateCounts(int c0, int c1, int c2)
         {
+            if (_paused) return;   // frozen: ignore late count updates
             _counts[0] = c0; _counts[1] = c1; _counts[2] = c2;
             if (_active && !_finished) Refresh();
+        }
+
+        /// <summary>
+        /// Freezes the current voting panel (countdown and vote counts stop moving) and
+        /// keeps it on screen, then clears it after ResultDisplayDuration. Used when the
+        /// ship leaves the moon mid-poll: the poll is cancelled, no winner is applied.
+        /// </summary>
+        public void Pause()
+        {
+            if (!_active || _finished) return;   // nothing to pause (or already a result)
+            _paused = true;
+            _autoHideTime = Time.time + Mathf.Max(1f, ModConfig.ResultDisplayDuration.Value);
+            SetVisible(true);
         }
 
         public void ShowResult(int winnerIndex, int winnerCount)
         {
             _finished = true;
+            _paused = false;
             _winnerIndex = winnerIndex;
             _winnerCount = winnerCount;
             _instruction.text = Loc.Get("panel.finished");
@@ -124,6 +141,7 @@ namespace ChatChaos.UI
         {
             _active = false;
             _finished = false;
+            _paused = false;
             _autoHideTime = float.MaxValue;
             SetVisible(false);
         }
@@ -133,6 +151,14 @@ namespace ChatChaos.UI
         private void Update()
         {
             if (!_active) return;
+
+            if (_paused)
+            {
+                // Frozen panel (ship left mid-poll): leave the timer and counts as they
+                // were, then clear the panel after the delay. Poll is cancelled.
+                if (Time.time >= _autoHideTime) Hide();
+                return;
+            }
 
             if (!_finished)
             {
