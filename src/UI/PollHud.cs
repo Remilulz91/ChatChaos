@@ -41,6 +41,7 @@ namespace ChatChaos.UI
         private bool _active;
         private bool _finished;
         private bool _paused;
+        private bool _pausedPulse;
         private readonly string[] _labels = new string[MaxRows];
         private readonly int[] _counts = new int[MaxRows];
         private int _rowsUsed;
@@ -88,6 +89,7 @@ namespace ChatChaos.UI
 
             _finished = false;
             _paused = false;
+            _pausedPulse = false;
             _winnerIndex = -1;
             _endTime = Time.time + duration;
             _autoHideTime = float.MaxValue;   // the voting panel never auto-hides
@@ -119,6 +121,8 @@ namespace ChatChaos.UI
         public void Pause()
         {
             if (!_active || _finished) return;   // nothing to pause (or already a result)
+            float remaining = _endTime - Time.time;
+            _pausedPulse = remaining <= 10f && remaining > 0f;   // keep beating if we froze in the last 10s
             _paused = true;
             _autoHideTime = Time.time + Mathf.Max(1f, ModConfig.ResultDisplayDuration.Value);
             SetVisible(true);
@@ -128,6 +132,7 @@ namespace ChatChaos.UI
         {
             _finished = true;
             _paused = false;
+            _pausedPulse = false;
             _winnerIndex = winnerIndex;
             _winnerCount = winnerCount;
             _instruction.text = Loc.Get("panel.finished");
@@ -150,6 +155,7 @@ namespace ChatChaos.UI
             _active = false;
             _finished = false;
             _paused = false;
+            _pausedPulse = false;
             _autoHideTime = float.MaxValue;
             if (_clockIcon != null) _clockIcon.gameObject.SetActive(false);
             ApplyTimerVisual(1f, HeaderText);
@@ -164,8 +170,14 @@ namespace ChatChaos.UI
 
             if (_paused)
             {
-                // Frozen panel (ship left mid-poll): leave the timer and counts as they
-                // were, then clear the panel after the delay. Poll is cancelled.
+                // Frozen panel (ship left mid-poll): the number stays put and the counts
+                // stay frozen, but if we froze in the last 10 seconds it keeps "beating"
+                // (black<->red + grow/shrink) on a loop until the panel clears. Cancelled.
+                if (_pausedPulse)
+                {
+                    float p = Mathf.Sin((Time.time % 1f) * Mathf.PI);   // one beat per second
+                    ApplyTimerVisual(Mathf.Lerp(1f, 1.6f, p), Color.Lerp(HeaderText, AlarmRed, p));
+                }
                 if (Time.time >= _autoHideTime) Hide();
                 return;
             }

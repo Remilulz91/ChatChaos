@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.11.0
+- When a poll is frozen by takeoff during the last 10 seconds, the countdown number now
+  keeps pulsing (black<->red + grow/shrink) on a loop while staying frozen, until the
+  panel disappears after 10s. Counts stay frozen and no event is applied.
+
 ## 0.10.0
 - Fixed the build error (duplicate local variable name in the HUD).
 - Non-host players who configured an account now get a one-time on-screen notice (and a
