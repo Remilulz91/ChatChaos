@@ -129,8 +129,8 @@ namespace ChatChaos.Config
                 "Set e.g. 150 to run a new poll repeatedly until the ship leaves.");
 
             ResultDisplayDuration = cfg.Bind(
-                "Poll", "ResultDisplayDuration", 6f,
-                "How long the winner panel stays on screen after voting ends.");
+                "Poll", "ResultDisplayDuration", 10f,
+                "How long the winner panel stays on screen after voting ends, in seconds.");
 
             SkipCompanyMoon = cfg.Bind(
                 "Poll", "SkipCompanyMoon", true,

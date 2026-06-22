@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.6.0
+- Fixed the poll panel sometimes staying stuck on screen after the result: the panel
+  now hides itself with an internal timer (independent of the network), so it always
+  disappears completely once the result has been shown.
+- The result panel now stays for 10 seconds by default (was 6). Configurable via
+  Poll/ResultDisplayDuration.
+- Confirmed lifecycle: panel hidden until a poll starts, appears with live-updating
+  vote counts during voting, shows the winner, then clears on its own.
+
 ## 0.5.0
 - New on-screen tip when the Twitch connection is established (shown to all players):
   "ChatChaos - Twitch / Connected as {user}." (read-only variant when no token is set).

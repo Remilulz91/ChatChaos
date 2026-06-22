@@ -44,6 +44,7 @@ namespace ChatChaos.UI
         private readonly int[] _counts = new int[MaxRows];
         private int _rowsUsed;
         private float _endTime;
+        private float _autoHideTime = float.MaxValue;
         private int _winnerIndex = -1;
         private int _winnerCount;
 
@@ -86,6 +87,7 @@ namespace ChatChaos.UI
             _finished = false;
             _winnerIndex = -1;
             _endTime = Time.time + duration;
+            _autoHideTime = float.MaxValue;   // the voting panel never auto-hides
             _active = true;
 
             _title.text = Loc.Get("panel.title");
@@ -108,6 +110,12 @@ namespace ChatChaos.UI
             _winnerIndex = winnerIndex;
             _winnerCount = winnerCount;
             _instruction.text = Loc.Get("panel.finished");
+
+            // Self-contained timer: the result panel clears on its own after the
+            // configured duration, even if the host's "hide" network message is lost.
+            _autoHideTime = Time.time + Mathf.Max(1f, ModConfig.ResultDisplayDuration.Value);
+            _active = true;
+
             SetVisible(true);
             Refresh();
         }
@@ -116,6 +124,7 @@ namespace ChatChaos.UI
         {
             _active = false;
             _finished = false;
+            _autoHideTime = float.MaxValue;
             SetVisible(false);
         }
 
@@ -133,6 +142,9 @@ namespace ChatChaos.UI
             else
             {
                 _timer.text = "";
+                // Result view clears itself after ResultDisplayDuration (set in ShowResult),
+                // so the panel always disappears completely on its own.
+                if (Time.time >= _autoHideTime) Hide();
             }
         }
 
