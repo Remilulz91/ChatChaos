@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.51.0
+- Winner panel is now compact: when only the winner is shown, the panel shrinks to a
+  small header + single row (instead of keeping the full 3-option height), matching the
+  reference look. The panel's top edge stays fixed so nothing jumps.
+- Winner text is now dark for proper contrast on the green bar (was light/looked yellow).
+- Removed the trophy emoji from the winner count: the game's pixel font has no glyph for
+  it, so it rendered as an empty square.
+
 ## 0.50.0
 - The poll panel now uses the game's own font (TextMeshPro) instead of a generic smooth
   font, for the authentic terminal/pixel look. Font is grabbed from the game HUD at

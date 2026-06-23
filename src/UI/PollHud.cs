@@ -33,6 +33,7 @@ namespace ChatChaos.UI
 
         private const int PanelWidth = 470;
         private const int PanelHeight = 232;
+        private const int ResultHeight = 145;   // compact panel when only the winner is shown
         private const int Pad = 16;
         private const int RowHeight = 34;
         private const int RowGap = 9;
@@ -108,8 +109,17 @@ namespace ChatChaos.UI
             if (_clockIcon != null) _clockIcon.gameObject.SetActive(true);
             ApplyTimerVisual(1f, HeaderText);
 
+            SetPanelHeight(PanelHeight);   // full size for the 3-option list
             SetVisible(true);
             Refresh();
+        }
+
+        /// <summary>Resizes the panel, keeping its TOP edge fixed (so content doesn't jump).</summary>
+        private void SetPanelHeight(float height)
+        {
+            float ay = Mathf.Clamp01(ModConfig.HudAnchorY.Value);
+            _panel.sizeDelta = new Vector2(PanelWidth, height);
+            _panel.anchoredPosition = new Vector2(0, (1f - ay) * (PanelHeight - height));
         }
 
         public void UpdateCounts(int c0, int c1, int c2)
@@ -154,6 +164,7 @@ namespace ChatChaos.UI
             if (_clockIcon != null) _clockIcon.gameObject.SetActive(false);
             ApplyTimerVisual(1f, HeaderText);
 
+            SetPanelHeight(ResultHeight);   // compact: header + the winner only
             SetVisible(true);
             Refresh();
         }
@@ -289,9 +300,10 @@ namespace ChatChaos.UI
 
             string label = (_winnerIndex >= 0 && _winnerIndex < _rowsUsed) ? _labels[_winnerIndex] : "";
             _rowLabel[0].text = label;                 // winner only, no number
-            _rowLabel[0].color = RowText;
-            _rowCount[0].text = _winnerCount + "  \U0001F3C6";
-            _rowCount[0].color = RowText;
+            _rowLabel[0].color = HeaderText;           // dark text reads better on the green bar
+            // No trophy emoji: the game's pixel font has no glyph for it (renders as a square).
+            _rowCount[0].text = _winnerCount.ToString();
+            _rowCount[0].color = HeaderText;
         }
 
         // ----------------------------------------------------------------- ui build
