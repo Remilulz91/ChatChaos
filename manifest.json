@@ -1,7 +1,7 @@
 {
   "name": "ChatChaos",
   "author": "Remilulz_91",
-  "version_number": "0.16.0",
+  "version_number": "0.17.0",
   "website_url": "https://github.com/Remilulz91/ChatChaos",
   "description": "Your Twitch chat votes live to unleash random events on the run. Polls appear on screen and in chat; viewers type 1, 2 or 3. ALL players must install (same version).",
   "dependencies": [

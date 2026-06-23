@@ -51,6 +51,7 @@ namespace ChatChaos.Core
         {
             if (!IsHost) return;
             _connTipShown = false;          // re-show the "connected" tip for this session
+            DoubleOrNothing.Reset();        // clear any armed gamble at game start
             TwitchClient.StartFromConfig();
         }
 
@@ -99,6 +100,8 @@ namespace ChatChaos.Core
             _landed = true;
             if (!IsHost) return;
 
+            DoubleOrNothing.OnLanded(isCompanyMoon);   // arm-aware: shows the warning at the Company
+
             if (isCompanyMoon && ModConfig.SkipCompanyMoon.Value)
             {
                 Plugin.Log.LogInfo("ChatChaos: safe moon — no polls here.");
@@ -145,6 +148,8 @@ namespace ChatChaos.Core
         {
             _landed = false;
             if (!IsHost) return;   // clients update their HUD from the host's messages
+
+            DoubleOrNothing.OnTookOff();   // resolve the gamble if leaving the Company while armed
 
             if (_pollsThisMoon)
                 Announce(Loc.Get("chat.takeoff"));

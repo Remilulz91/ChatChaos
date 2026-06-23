@@ -72,6 +72,10 @@ namespace ChatChaos.Localization
                 ["tip.connected.readonly"] = "Connected in read-only mode (no token: votes count, no chat posts).",
                 ["tip.client.header"]      = "ChatChaos",
                 ["tip.client.body"]        = "You are not the host: your account is ignored. Only the host's chat drives the votes.",
+                ["qod.header"]             = "Double or Nothing",
+                ["qod.armed"]              = "When you leave, your credits will be either doubled or halved.",
+                ["qod.win"]                = "<color=#4CD94C>WON</color>\nYou just won {0} credits.",
+                ["qod.lose"]               = "<color=#E04545>LOST</color>\nYou just lost {0} credits.",
                 ["tip.header"]             = "ChatChaos - Twitch active",
                 ["tip.landed"]             = "Automatic polls are now active. Landed on {0}: first vote in {1}s.",
             };
@@ -93,6 +97,10 @@ namespace ChatChaos.Localization
                 ["tip.connected.readonly"] = "Connecté en lecture seule (sans jeton : les votes comptent, pas d'envoi dans le chat).",
                 ["tip.client.header"]      = "ChatChaos",
                 ["tip.client.body"]        = "Tu n'es pas l'hôte : ton compte est ignoré. Seul le chat de l'hôte pilote les votes.",
+                ["qod.header"]             = "Quitte ou Double",
+                ["qod.armed"]              = "Lorsque vous partirez, vos crédits seront soit doublés, soit divisés par 2.",
+                ["qod.win"]                = "<color=#4CD94C>GAGNÉ</color>\nVous venez de gagner {0} crédits.",
+                ["qod.lose"]               = "<color=#E04545>PERDU</color>\nVous venez de perdre {0} crédits.",
                 ["tip.header"]             = "ChatChaos - Twitch activé",
                 ["tip.landed"]             = "Les sondages automatiques sont activés. Atterrissage sur {0} : premier vote dans {1}s.",
             };

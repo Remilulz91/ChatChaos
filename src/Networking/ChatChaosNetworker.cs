@@ -218,6 +218,28 @@ namespace ChatChaos.Networking
             HealAllPlayersLocal();
         }
 
+        /// <summary>Sets the terminal's group credits on every machine (for Double or Nothing).</summary>
+        public void SetGroupCredits(int credits)
+        {
+            if (!IsServer) return;
+            ApplyGroupCreditsLocal(credits);
+            Safe(() => SetGroupCreditsClientRpc(credits));
+        }
+
+        [ClientRpc]
+        private void SetGroupCreditsClientRpc(int credits)
+        {
+            if (IsServer) return;
+            ApplyGroupCreditsLocal(credits);
+        }
+
+        private static void ApplyGroupCreditsLocal(int credits)
+        {
+            var terminal = Object.FindObjectOfType<Terminal>();
+            if (terminal == null) return;
+            terminal.groupCredits = credits;
+        }
+
         private static void HealAllPlayersLocal()
         {
             var sor = StartOfRound.Instance;

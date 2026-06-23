@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.17.0
+- New poll option: "Double or nothing" / "Quitte ou double". When it wins, it ARMS a
+  gamble that stays pending until the ship next visits the Company:
+  - arriving at the Company shows a warning message,
+  - leaving the Company (the lever) doubles or halves (50/50) ALL the terminal's group
+    credits, with a green WON / red LOST message, then disarms.
+  Credits are synced to every player; messages use the game's native note (no overlap
+  with the poll panel, since polls never run at the Company).
+
 ## 0.16.0
 - New event: "Max health" / "Santé max" — heals every living player back to full health
   (100 HP in vanilla), clearing the injured/bleeding state. Dead players are unaffected.
