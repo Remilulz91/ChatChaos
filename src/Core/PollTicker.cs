@@ -44,6 +44,7 @@ namespace ChatChaos.Core
             SpeedBoost.Tick();
             MicMute.Tick();
             SoundMute.Tick();
+            WinterSale.Tick();
             TrackLanding();
         }
 

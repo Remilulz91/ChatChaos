@@ -762,6 +762,36 @@ namespace ChatChaos.Networking
             DetonateAllMinesLocal();
         }
 
+        /// <summary>Applies the winter-sale discounts (from a shared seed) on every machine.</summary>
+        public void SetWinterSale(int seed)
+        {
+            if (!IsServer) return;
+            Core.WinterSale.ApplyLocal(seed);
+            Safe(() => SetWinterSaleClientRpc(seed));
+        }
+
+        [ClientRpc]
+        private void SetWinterSaleClientRpc(int seed)
+        {
+            if (IsServer) return;
+            Core.WinterSale.ApplyLocal(seed);
+        }
+
+        /// <summary>Restores the original store prices on every machine.</summary>
+        public void EndWinterSale()
+        {
+            if (!IsServer) return;
+            Core.WinterSale.RestoreLocal();
+            Safe(() => EndWinterSaleClientRpc());
+        }
+
+        [ClientRpc]
+        private void EndWinterSaleClientRpc()
+        {
+            if (IsServer) return;
+            Core.WinterSale.RestoreLocal();
+        }
+
         private static void DetonateAllMinesLocal()
         {
             int n = 0;

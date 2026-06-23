@@ -61,6 +61,7 @@ namespace ChatChaos.Core
             SpeedBoost.Reset();             // clear any leftover speed boost
             MicMute.Reset();                // make sure the mic isn't left muted
             SoundMute.Reset();              // make sure game sound isn't left muted
+            WinterSale.Reset();             // restore store prices if a sale was running
             TwitchClient.StartFromConfig();
         }
 

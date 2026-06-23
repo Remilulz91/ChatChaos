@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.37.0
+- New event: "Winter sale (1m)" / "Soldes d'hiver (1m)" — forces a random discount
+  (30-90% off) on every store item for 60 seconds, then restores the original prices.
+  Discounts come from a shared seed so every player (and the host's charge) sees the same
+  prices.
+
 ## 0.36.0
 - New event: "Mute sound (1m)" / "Coupe le son (1m)" — silences all game audio on the
   host (game sounds + other players' voices) for 60 seconds, then restores it.

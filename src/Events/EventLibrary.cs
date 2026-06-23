@@ -114,6 +114,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("mute_sound", "Mute sound (1m)", "Coupe le son (1m)", () =>
                 Core.SoundMute.Mute(60f));
 
+            EventRegistry.Add("winter_sale", "Winter sale (1m)", "Soldes d'hiver (1m)", () =>
+                Core.WinterSale.Trigger(60f));
+
             EventRegistry.Add("power_on", "Turn power on", "Allumer courant", () =>
                 EventActions.SetFacilityPower(true));
 
