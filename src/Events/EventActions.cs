@@ -237,6 +237,64 @@ namespace ChatChaos.Events
         }
 
         /// <summary>
+        /// Replaces every INDOOR enemy with a Snare Flea ("larva") at its position. Outdoor
+        /// enemies are left alone. Host-authoritative via the game's spawn/kill methods.
+        /// </summary>
+        public static void LarvaeInfestation()
+        {
+            var rm = RoundManager.Instance;
+            if (rm == null || rm.SpawnedEnemies == null)
+            {
+                Plugin.Log.LogWarning("[ChatChaos][Larvae] RoundManager / enemy list not ready.");
+                return;
+            }
+
+            var flea = FindSnareFleaType();
+            if (flea == null)
+            {
+                Plugin.Log.LogWarning("[ChatChaos][Larvae] Snare Flea enemy type not found.");
+                return;
+            }
+
+            // Snapshot the indoor enemies first (we modify the list while replacing).
+            var toReplace = new List<EnemyAI>();
+            foreach (var e in rm.SpawnedEnemies)
+                if (e != null && !e.isEnemyDead && !e.isOutside && e.enemyType != flea)
+                    toReplace.Add(e);
+
+            int n = 0;
+            foreach (var e in toReplace)
+            {
+                Vector3 pos = e.transform.position;
+                float yRot = e.transform.eulerAngles.y;
+                try
+                {
+                    e.KillEnemyOnOwnerClient(true);                 // remove the old enemy
+                    rm.SpawnEnemyGameObject(pos, yRot, -1, flea);   // spawn a larva there
+                    n++;
+                }
+                catch (System.Exception ex)
+                {
+                    Plugin.Log.LogError($"[ChatChaos][Larvae] replace failed: {ex.Message}");
+                }
+            }
+
+            Plugin.Log.LogInfo($"[ChatChaos][Larvae] replaced {n} indoor enemy(ies) with snare fleas.");
+        }
+
+        private static EnemyType? FindSnareFleaType()
+        {
+            foreach (var t in Resources.FindObjectsOfTypeAll<EnemyType>())
+            {
+                if (t == null) continue;
+                string name = (t.enemyName ?? "").ToLowerInvariant();
+                if (name.Contains("centipede") || name.Contains("snare") || name.Contains("flea"))
+                    return t;
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Revives all dead players (teleported back to the ship). Living players are left
         /// where they are. Networked.
         /// </summary>

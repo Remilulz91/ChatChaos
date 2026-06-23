@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.39.0
+- New event: "Larvae infestation" / "Infestation de larves" — replaces every indoor enemy
+  with a Snare Flea ("larva") at its position. Outdoor enemies are untouched.
+  Host-authoritative via the game's spawn/kill methods.
+
 ## 0.38.0
 - New event: "Random delivery" / "Livraison aléatoire" — orders a random number (1-8) of
   random store items for free; the dropship comes and delivers them. Uses the game's own
