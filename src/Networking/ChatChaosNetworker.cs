@@ -165,6 +165,38 @@ namespace ChatChaos.Networking
             p.DropAllHeldItems(true, false);
         }
 
+        /// <summary>
+        /// Sets every LIVING player to 1 HP. Each machine damages its own player (the
+        /// owner) down to 1, and the game's damage RPC syncs the health bar to everyone.
+        /// </summary>
+        public void SetOneHp()
+        {
+            if (!IsServer) return;
+            SetLocalPlayerOneHp();                     // host's own player
+            Safe(() => SetOneHpClientRpc());           // every other player
+        }
+
+        [ClientRpc]
+        private void SetOneHpClientRpc()
+        {
+            if (IsServer) return;   // host already handled its own
+            SetLocalPlayerOneHp();
+        }
+
+        private static void SetLocalPlayerOneHp()
+        {
+            var sor = StartOfRound.Instance;
+            if (sor == null) return;
+
+            var p = sor.localPlayerController;
+            if (p == null || !p.isPlayerControlled || p.isPlayerDead) return;
+
+            int damage = p.health - 1;
+            if (damage <= 0) return;   // already at 1 HP (or less)
+
+            p.DamagePlayer(damage, true, true, CauseOfDeath.Unknown, 0, false, default);
+        }
+
         [ClientRpc]
         private void StartPollClientRpc(string l0, string l1, string l2, float duration)
         {

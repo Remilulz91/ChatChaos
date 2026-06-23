@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.15.0
+- New event: "1 HP" / "1 PV" — sets every living player to 1 HP (dead players are
+  unaffected). Networked via the game's damage path so the health bar syncs to everyone.
+
 ## 0.14.0
 - New event: "Items dropped" / "Objets lâchés" — every living player drops all the items
   they hold (dead players are unaffected). Networked: each machine drops its own player's

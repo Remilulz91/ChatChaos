@@ -42,8 +42,8 @@ namespace ChatChaos.Events
             EventRegistry.Add("drop_items", "Items dropped", "Objets lâchés", () =>
                 EventActions.DropAllItemsFromLivingPlayers());
 
-            EventRegistry.Add("one_hp", "1 HP", "1 HP", () =>
-                Placeholder("one_hp"));
+            EventRegistry.Add("one_hp", "1 HP", "1 PV", () =>
+                EventActions.SetAllLivingPlayersToOneHp());
 
             EventRegistry.Add("recharge_gear", "Recharge equipment", "Recharge équipements", () =>
                 Placeholder("recharge_gear"));

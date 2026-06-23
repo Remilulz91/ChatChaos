@@ -73,5 +73,25 @@ namespace ChatChaos.Events
             if (p != null && p.isPlayerControlled && !p.isPlayerDead)
                 p.DropAllHeldItems(true, false);
         }
+
+        /// <summary>
+        /// Sets every LIVING player to 1 HP. Dead players are not affected. Networked:
+        /// each machine damages its own player down to 1.
+        /// </summary>
+        public static void SetAllLivingPlayersToOneHp()
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+            {
+                n.SetOneHp();
+                return;
+            }
+
+            // Fallback (no networker, e.g. very early/solo): set our own HP to 1.
+            var sor = StartOfRound.Instance;
+            var p = sor != null ? sor.localPlayerController : null;
+            if (p != null && p.isPlayerControlled && !p.isPlayerDead && p.health > 1)
+                p.DamagePlayer(p.health - 1, true, true, CauseOfDeath.Unknown, 0, false, default);
+        }
     }
 }
