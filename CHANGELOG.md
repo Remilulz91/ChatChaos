@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.46.0
+- Non-stackable events: an event that is active/pending is no longer proposed again until
+  it ends. Double or Nothing stays excluded until it resolves at the Company; the timed
+  effects (Time frozen, Stamina, Ship locked, Fast & Serious, Mute mic/sound, Winter sale,
+  Berserk) are excluded for their duration. Instant events are unaffected.
+
 ## 0.45.0
 - New default HUD layout: the poll panel is on the RIGHT (like the reference stream) and
   the effect-countdown panel is on the LEFT, so they never overlap. Both still fully

@@ -34,6 +34,7 @@ namespace ChatChaos.Core
             _active = true;
             AudioListener.volume = 0f;
             ChatChaosNetworker.Active?.ShowEffectTimer("soundmute", "fx.soundmute", seconds);
+            EventGuard.LockFor("mute_sound", seconds);
             Log.Info("Sound", $"host game sound muted for {seconds:0}s.");
         }
 

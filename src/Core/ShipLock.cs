@@ -28,6 +28,7 @@ namespace ChatChaos.Core
             _unlockTime = Time.time + seconds;
             n.SetShipLocked(true);
             n.ShowEffectTimer("shiplock", "fx.shiplock", seconds);
+            EventGuard.LockFor("ship_locked", seconds);
             Plugin.Log.LogInfo($"ChatChaos: ship locked for {seconds:0}s.");
         }
 

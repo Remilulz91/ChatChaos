@@ -454,6 +454,7 @@ namespace ChatChaos.Networking
             if (!IsServer) return;
             Core.StaminaBoost.Activate(seconds);   // host's own player
             ShowEffectTimer("stamina", "fx.stamina", seconds);
+            Core.EventGuard.LockFor("stamina_boost", seconds);
             Safe(() => StaminaBoostClientRpc(seconds));
         }
 
@@ -470,6 +471,7 @@ namespace ChatChaos.Networking
             if (!IsServer) return;
             Core.SpeedBoost.Activate(seconds);
             ShowEffectTimer("speed", "fx.speed", seconds);
+            Core.EventGuard.LockFor("fast_serious", seconds);
             Safe(() => SpeedBoostClientRpc(seconds));
         }
 

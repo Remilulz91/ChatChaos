@@ -66,6 +66,7 @@ namespace ChatChaos.Core
             _pendingIndex = idx;
             _phase = Phase.Signal;
             _phaseEndTime = Time.time + SignalDuration;
+            EventGuard.LockFor("berserk", SignalDuration + BerserkDuration);
             ChatChaosNetworker.Active?.ShowBerserkSignal();
             Log.Info("Berserk", $"RECEIVING SIGNAL shown; player index {idx} goes berserk in {SignalDuration:0.0}s.");
         }

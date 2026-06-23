@@ -25,12 +25,14 @@ namespace ChatChaos.Core
         {
             _armed = false;
             _atCompany = false;
+            EventGuard.Unlock("double_or_nothing");
         }
 
         /// <summary>Called when the poll option wins (host only).</summary>
         public static void Arm()
         {
             _armed = true;
+            EventGuard.Lock("double_or_nothing");   // not re-proposable until it resolves
             Plugin.Log.LogInfo("DoubleOrNothing: armed — resolves at the next Company visit.");
         }
 
@@ -57,6 +59,8 @@ namespace ChatChaos.Core
 
         private static void Resolve()
         {
+            EventGuard.Unlock("double_or_nothing");   // resolved -> can be proposed again
+
             var terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
             if (terminal == null)
             {

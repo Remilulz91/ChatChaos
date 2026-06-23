@@ -32,6 +32,7 @@ namespace ChatChaos.Core
             _active = true;
             SetMuted(true);
             ChatChaosNetworker.Active?.ShowEffectTimer("micmute", "fx.micmute", seconds);
+            EventGuard.LockFor("mute_mic", seconds);
             Log.Info("Mic", $"host mic muted for {seconds:0}s.");
         }
 

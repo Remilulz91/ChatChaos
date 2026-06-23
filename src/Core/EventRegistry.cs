@@ -80,7 +80,11 @@ namespace ChatChaos.Core
         /// </summary>
         public static List<ChatEvent> PickRandom(int count)
         {
-            var pool = new List<Def>(_defs);
+            // Skip events that are locked (active/pending non-stackable ones).
+            var pool = new List<Def>();
+            foreach (var d in _defs)
+                if (!EventGuard.IsLocked(d.Id)) pool.Add(d);
+
             var result = new List<ChatEvent>();
             count = Math.Min(count, pool.Count);
             for (int i = 0; i < count; i++)
@@ -95,7 +99,7 @@ namespace ChatChaos.Core
         /// <summary>Pick one random event (instantiated) whose id is not <paramref name="excludeId"/>.</summary>
         public static ChatEvent? PickRandomExcluding(string excludeId)
         {
-            var pool = _defs.FindAll(d => d.Id != excludeId);
+            var pool = _defs.FindAll(d => d.Id != excludeId && !EventGuard.IsLocked(d.Id));
             if (pool.Count == 0) return null;
             return pool[_rng.Next(pool.Count)].Make();
         }

@@ -63,6 +63,7 @@ namespace ChatChaos.Core
             SoundMute.Reset();              // make sure game sound isn't left muted
             WinterSale.Reset();             // restore store prices if a sale was running
             EffectTimers.Reset();           // clear any leftover countdowns
+            EventGuard.Reset();             // clear any event locks
             TwitchClient.StartFromConfig();
         }
 
