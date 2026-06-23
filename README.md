@@ -90,9 +90,9 @@ All options live in `BepInEx/config/Remilulz_91.ChatChaos.cfg`:
 | Chat | `ShowInGameChat` | `true` | Also show poll messages in the in-game chat (all players). |
 | Chat | `InGameChatColor` | `F0A91E` | Hex colour of the prefix in the in-game chat. |
 | Display | `Language` | `Auto` | `Auto`, `English` or `French`. |
-| Display | `PanelAnchorX/Y` | `0.30 / 0.22` | Panel position (0–1 across the screen). |
+| Display | `PanelAnchorX/Y` | `0.97 / 0.45` | Poll panel position (right side by default). |
 | Display | `PanelScale` | `1.0` | Panel size. |
-| Display | `TimerPanelAnchorX/Y` | `0.985 / 0.5` | Position of the effect-countdown panel (right-centre). |
+| Display | `TimerPanelAnchorX/Y` | `0.015 / 0.55` | Position of the effect-countdown panel (left side by default). |
 | Debug | `VerboseLogging` | `false` | Extra detailed logs (every vote, every broadcast) for debugging. |
 
 ---

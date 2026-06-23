@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.45.0
+- New default HUD layout: the poll panel is on the RIGHT (like the reference stream) and
+  the effect-countdown panel is on the LEFT, so they never overlap. Both still fully
+  configurable in Display/PanelAnchor* and Display/TimerPanelAnchor*.
+
 ## 0.44.0
 - Moved the effect-countdown panel to the right edge (vertically centred) so it no longer
   overlaps the vanilla top-left HUD (stamina/weight). Position is now configurable via

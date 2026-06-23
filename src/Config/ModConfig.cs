@@ -181,26 +181,26 @@ namespace ChatChaos.Config
                 "Auto = French if the game/system language is French, English otherwise.");
 
             HudAnchorX = cfg.Bind(
-                "Display", "PanelAnchorX", 0.30f,
-                "Horizontal position of the poll panel (0 = far left, 1 = far right).");
+                "Display", "PanelAnchorX", 0.97f,
+                "Horizontal position of the poll panel (0 = far left, 1 = far right). Default right.");
 
             HudAnchorY = cfg.Bind(
-                "Display", "PanelAnchorY", 0.22f,
-                "Vertical position of the poll panel (0 = bottom, 1 = top).");
+                "Display", "PanelAnchorY", 0.45f,
+                "Vertical position of the poll panel (0 = bottom, 1 = top). Default centre-ish.");
 
             HudScale = cfg.Bind(
                 "Display", "PanelScale", 1.0f,
                 "Overall scale of the poll panel (1 = default size).");
 
             TimerAnchorX = cfg.Bind(
-                "Display", "TimerPanelAnchorX", 0.985f,
+                "Display", "TimerPanelAnchorX", 0.015f,
                 "Horizontal position of the effect-countdown panel (0 = far left, 1 = far right). " +
-                "Default right edge.");
+                "Default left edge.");
 
             TimerAnchorY = cfg.Bind(
-                "Display", "TimerPanelAnchorY", 0.5f,
+                "Display", "TimerPanelAnchorY", 0.55f,
                 "Vertical position of the effect-countdown panel (0 = bottom, 1 = top). " +
-                "Default vertical centre.");
+                "Default just above centre.");
 
             // -- Debug --
             VerboseLogging = cfg.Bind(
