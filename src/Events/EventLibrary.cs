@@ -37,7 +37,7 @@ namespace ChatChaos.Events
             // --- Placeholder events (replace the bodies with real effects) ---
 
             EventRegistry.Add("random_death", "Random death", "Mort aléatoire", () =>
-                Placeholder("random_death"));
+                EventActions.KillRandomAlivePlayer());
 
             EventRegistry.Add("drop_items", "Drop items", "Drop objets", () =>
                 Placeholder("drop_items"));

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.0
+- First real event implemented: "Random death" / "Mort aléatoire" now kills one random
+  LIVING player (dead players and empty slots are excluded). Networked so the death is
+  synced to everyone; each machine kills only its own player (the owner) so the game
+  propagates the death correctly.
+
 ## 0.12.0
 - Hardened the poll HUD against takeoff edge cases (voting and winner views):
   - More reliable takeoff detection (shipHasLanded AND not leaving AND not in orbit),

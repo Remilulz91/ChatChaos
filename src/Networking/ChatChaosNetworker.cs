@@ -1,6 +1,7 @@
 using System;
 using ChatChaos.UI;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace ChatChaos.Networking
 {
@@ -98,6 +99,41 @@ namespace ChatChaos.Networking
             if (!IsServer) return;
             PollHud.Instance?.Pause();
             Safe(() => PauseClientRpc());
+        }
+
+        // ===================== EVENT EFFECTS (host -> clients) =====================
+
+        /// <summary>
+        /// Kills the player at <paramref name="index"/> in StartOfRound.allPlayerScripts.
+        /// Each machine kills only its OWN player (the owner), so the game syncs the death
+        /// naturally. The host handles its own player locally and mirrors to clients.
+        /// </summary>
+        public void KillPlayer(int index)
+        {
+            if (!IsServer) return;
+            KillIfLocalTarget(index);                 // host's own player, if it's the target
+            Safe(() => KillPlayerClientRpc(index));    // every other player
+        }
+
+        [ClientRpc]
+        private void KillPlayerClientRpc(int index)
+        {
+            if (IsServer) return;   // host already handled its own player
+            KillIfLocalTarget(index);
+        }
+
+        private static void KillIfLocalTarget(int index)
+        {
+            var sor = StartOfRound.Instance;
+            if (sor == null || sor.allPlayerScripts == null) return;
+            if (index < 0 || index >= sor.allPlayerScripts.Length) return;
+
+            var target = sor.allPlayerScripts[index];
+            if (target == null) return;
+            if (target != sor.localPlayerController) return;   // only kill your OWN player
+            if (target.isPlayerDead) return;
+
+            target.KillPlayer(Vector3.zero, true, CauseOfDeath.Unknown, 0, default);
         }
 
         [ClientRpc]
