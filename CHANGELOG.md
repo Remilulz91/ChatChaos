@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.41.0
+- New event: "Start of day" / "Début de journée" — resets the in-game day clock back to
+  the morning landing time (currentDayTime = 0), which also pushes back the end-of-day
+  cutoff. Synced to all.
+
 ## 0.40.0
 - New event: "Random event" / "Évènement aléatoire" — picks one other event at random,
   announces it in chat ("Random event launched: X" / "Évènement aléatoire lancé : X"),

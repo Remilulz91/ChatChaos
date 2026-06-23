@@ -282,6 +282,16 @@ namespace ChatChaos.Events
             Plugin.Log.LogInfo($"[ChatChaos][Larvae] replaced {n} indoor enemy(ies) with snare fleas.");
         }
 
+        /// <summary>Resets the in-game day clock to the morning start. Networked.</summary>
+        public static void ResetToMorning()
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+                n.ResetDayTime();
+            else
+                Plugin.Log.LogWarning("ChatChaos: reset day time skipped (networker not ready).");
+        }
+
         private static EnemyType? FindSnareFleaType()
         {
             foreach (var t in Resources.FindObjectsOfTypeAll<EnemyType>())

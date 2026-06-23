@@ -672,6 +672,29 @@ namespace ChatChaos.Networking
             Core.Berserk.SetActivePlayer(index);
         }
 
+        /// <summary>Resets the in-game day clock back to the morning start on every machine.</summary>
+        public void ResetDayTime()
+        {
+            if (!IsServer) return;
+            ApplyResetDayTimeLocal();
+            Safe(() => ResetDayTimeClientRpc());
+        }
+
+        [ClientRpc]
+        private void ResetDayTimeClientRpc()
+        {
+            if (IsServer) return;
+            ApplyResetDayTimeLocal();
+        }
+
+        private static void ApplyResetDayTimeLocal()
+        {
+            var tod = TimeOfDay.Instance;
+            if (tod == null) return;
+            tod.currentDayTime = 0f;   // 0 = the default landing/morning time
+            Plugin.Log.LogInfo("[ChatChaos][Time] day clock reset to the morning start.");
+        }
+
         private static GrabbableObject? _hostBerserkShotgun;
 
         /// <summary>Host: spawn a shotgun and give it to player[index] (the berserk player).</summary>
