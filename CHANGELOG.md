@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.31.0
+- New event: "Berserk (45s)" — part 1 (core). When it wins, a "RECEIVING SIGNAL -> GO
+  BERSERK" overlay types out on screen; once it finishes, a random living player becomes
+  invincible to everything (mobs, turrets, mines, fall...) for 45s, then back to normal.
+  No music (kept out on purpose to avoid copyright/ban issues). Shotgun + unlimited ammo
+  come in the next version.
+
 ## 0.30.0
 - New event: "Random weather" / "Météo aléatoire" — picks a random weather from the
   current moon's possible weathers (prefers a change) and applies it. Visual effects

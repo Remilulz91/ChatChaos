@@ -99,6 +99,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("weather_random", "Random weather", "Météo aléatoire", () =>
                 EventActions.TriggerRandomWeather());
 
+            EventRegistry.Add("berserk", "Berserk (45s)", "Berserk (45s)", () =>
+                Core.Berserk.Trigger());
+
             EventRegistry.Add("power_on", "Turn power on", "Allumer courant", () =>
                 EventActions.SetFacilityPower(true));
 

@@ -29,6 +29,7 @@ namespace ChatChaos.Core
             Instance = go.AddComponent<PollTicker>();
 
             PollHud.EnsureExists();
+            BerserkHud.EnsureExists();
         }
 
         private void Update()
@@ -38,6 +39,7 @@ namespace ChatChaos.Core
             TimeFreeze.Tick();
             StaminaBoost.Tick();
             ShipLock.Tick();
+            Berserk.Tick();
             TrackLanding();
         }
 

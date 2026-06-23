@@ -57,6 +57,7 @@ namespace ChatChaos.Core
             TimeFreeze.Reset();             // clear any leftover time-freeze timer
             StaminaBoost.Reset();           // clear any leftover stamina boost
             ShipLock.Reset();               // clear any leftover ship lock
+            Berserk.Reset();                // clear any leftover berserk state
             TwitchClient.StartFromConfig();
         }
 

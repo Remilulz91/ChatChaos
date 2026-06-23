@@ -627,6 +627,36 @@ namespace ChatChaos.Networking
             Plugin.Log.LogInfo($"[ChatChaos][Weather] applied '{w}'.");
         }
 
+        /// <summary>Shows the "RECEIVING SIGNAL / GO BERSERK" overlay on every machine.</summary>
+        public void ShowBerserkSignal()
+        {
+            if (!IsServer) return;
+            BerserkHud.Instance?.ShowSignal();
+            Safe(() => ShowBerserkSignalClientRpc());
+        }
+
+        [ClientRpc]
+        private void ShowBerserkSignalClientRpc()
+        {
+            if (IsServer) return;
+            BerserkHud.Instance?.ShowSignal();
+        }
+
+        /// <summary>Sets the invincible Berserk player (index, -1 = none) on every machine.</summary>
+        public void SetBerserkPlayer(int index)
+        {
+            if (!IsServer) return;
+            Core.Berserk.SetActivePlayer(index);
+            Safe(() => SetBerserkPlayerClientRpc(index));
+        }
+
+        [ClientRpc]
+        private void SetBerserkPlayerClientRpc(int index)
+        {
+            if (IsServer) return;
+            Core.Berserk.SetActivePlayer(index);
+        }
+
         private static void ToggleWeatherEffects(object tod, int activeIndex)
         {
             try
