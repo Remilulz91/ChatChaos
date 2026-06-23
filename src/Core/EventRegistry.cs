@@ -91,5 +91,13 @@ namespace ChatChaos.Core
             }
             return result;
         }
+
+        /// <summary>Pick one random event (instantiated) whose id is not <paramref name="excludeId"/>.</summary>
+        public static ChatEvent? PickRandomExcluding(string excludeId)
+        {
+            var pool = _defs.FindAll(d => d.Id != excludeId);
+            if (pool.Count == 0) return null;
+            return pool[_rng.Next(pool.Count)].Make();
+        }
     }
 }

@@ -382,30 +382,7 @@ namespace ChatChaos.Core
         /// AND, when enabled, to the in-game chat box (rich text, seen by all players).
         /// Set <paramref name="inGame"/> to false for Twitch-only messages.
         /// </summary>
-        private static void Announce(string text, bool inGame = true)
-        {
-            // Twitch chat (plain text).
-            if (ModConfig.AnnounceInChat.Value)
-            {
-                string prefix = (ModConfig.ChatPrefix.Value ?? "").Trim();
-                TwitchClient.Instance?.SendMessage(prefix.Length > 0 ? prefix + " " + text : text);
-            }
-
-            // In-game chat box (rich text, broadcast to every player by the host).
-            if (inGame && ModConfig.ShowInGameChat.Value)
-                PostInGame(text);
-        }
-
-        /// <summary>Posts to the in-game chat with a coloured mod prefix.</summary>
-        private static void PostInGame(string text)
-        {
-            string prefix = (ModConfig.ChatPrefix.Value ?? "").Trim();
-            string color = (ModConfig.InGameChatColorHex.Value ?? "").Trim();
-            string head = prefix.Length == 0
-                ? ""
-                : (color.Length > 0 ? $"<color=#{color}>{prefix}</color> " : prefix + " ");
-            GameChat.Show(head + text);
-        }
+        private static void Announce(string text, bool inGame = true) => ChatAnnounce.Say(text, inGame);
 
         private static void UiStart()
         {

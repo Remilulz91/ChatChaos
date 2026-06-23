@@ -123,6 +123,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("larvae_infestation", "Larvae infestation", "Infestation de larves", () =>
                 EventActions.LarvaeInfestation());
 
+            EventRegistry.Add("random_event", "Random event", "Évènement aléatoire", () =>
+                Core.RandomEvent.Trigger());
+
             EventRegistry.Add("power_on", "Turn power on", "Allumer courant", () =>
                 EventActions.SetFacilityPower(true));
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.40.0
+- New event: "Random event" / "Évènement aléatoire" — picks one other event at random,
+  announces it in chat ("Random event launched: X" / "Évènement aléatoire lancé : X"),
+  then runs it. Excludes itself to avoid recursion. Chat announcing was centralised into
+  a shared helper.
+
 ## 0.39.0
 - New event: "Larvae infestation" / "Infestation de larves" — replaces every indoor enemy
   with a Snare Flea ("larva") at its position. Outdoor enemies are untouched.
