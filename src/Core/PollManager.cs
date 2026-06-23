@@ -58,6 +58,7 @@ namespace ChatChaos.Core
             StaminaBoost.Reset();           // clear any leftover stamina boost
             ShipLock.Reset();               // clear any leftover ship lock
             Berserk.Reset();                // clear any leftover berserk state
+            SpeedBoost.Reset();             // clear any leftover speed boost
             TwitchClient.StartFromConfig();
         }
 

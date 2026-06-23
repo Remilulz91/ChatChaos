@@ -102,6 +102,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("berserk", "Berserk (45s)", "Berserk (45s)", () =>
                 Core.Berserk.Trigger());
 
+            EventRegistry.Add("fast_serious", "Fast & Serious (30s)", "Fast & Serious (30s)", () =>
+                EventActions.BoostSpeed(30f));
+
             EventRegistry.Add("power_on", "Turn power on", "Allumer courant", () =>
                 EventActions.SetFacilityPower(true));
 

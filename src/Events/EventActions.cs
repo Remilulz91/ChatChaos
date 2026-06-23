@@ -183,6 +183,16 @@ namespace ChatChaos.Events
                 Plugin.Log.LogWarning("ChatChaos: stamina boost skipped (networker not ready).");
         }
 
+        /// <summary>Boosts every player's movement speed for <paramref name="seconds"/>. Networked.</summary>
+        public static void BoostSpeed(float seconds)
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+                n.StartSpeedBoost(seconds);
+            else
+                Plugin.Log.LogWarning("ChatChaos: speed boost skipped (networker not ready).");
+        }
+
         /// <summary>
         /// Revives all dead players (teleported back to the ship). Living players are left
         /// where they are. Networked.

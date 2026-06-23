@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.33.0
+- New event: "Fast & Serious (30s)" — boosts every player's movement speed (x1.8) for 30
+  seconds, then restores the normal speed. Per-player, synced to all.
+
 ## 0.32.0
 - Berserk part 2: the berserk player now also gets a SHOTGUN with unlimited ammo for the
   45s. If the inventory is full, the currently held item is dropped to make room. The

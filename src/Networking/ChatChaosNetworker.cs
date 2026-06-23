@@ -463,6 +463,21 @@ namespace ChatChaos.Networking
             Core.StaminaBoost.Activate(seconds);
         }
 
+        /// <summary>Boosts every player's movement speed for <paramref name="seconds"/>.</summary>
+        public void StartSpeedBoost(float seconds)
+        {
+            if (!IsServer) return;
+            Core.SpeedBoost.Activate(seconds);
+            Safe(() => SpeedBoostClientRpc(seconds));
+        }
+
+        [ClientRpc]
+        private void SpeedBoostClientRpc(float seconds)
+        {
+            if (IsServer) return;
+            Core.SpeedBoost.Activate(seconds);
+        }
+
         /// <summary>
         /// Locks (closes the hangar door + blocks the lever) or unlocks the ship on every
         /// machine. The door/lever interactables are local, so each machine applies it.

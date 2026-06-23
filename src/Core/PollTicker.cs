@@ -41,6 +41,7 @@ namespace ChatChaos.Core
             ShipLock.Tick();
             Berserk.Tick();
             BerserkShotgun.Tick();
+            SpeedBoost.Tick();
             TrackLanding();
         }
 
