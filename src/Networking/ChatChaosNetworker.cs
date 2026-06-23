@@ -453,6 +453,7 @@ namespace ChatChaos.Networking
         {
             if (!IsServer) return;
             Core.StaminaBoost.Activate(seconds);   // host's own player
+            ShowEffectTimer("stamina", "fx.stamina", seconds);
             Safe(() => StaminaBoostClientRpc(seconds));
         }
 
@@ -468,6 +469,7 @@ namespace ChatChaos.Networking
         {
             if (!IsServer) return;
             Core.SpeedBoost.Activate(seconds);
+            ShowEffectTimer("speed", "fx.speed", seconds);
             Safe(() => SpeedBoostClientRpc(seconds));
         }
 
@@ -670,6 +672,21 @@ namespace ChatChaos.Networking
         {
             if (IsServer) return;
             Core.Berserk.SetActivePlayer(index);
+        }
+
+        /// <summary>Shows a countdown for a time-limited effect on every machine.</summary>
+        public void ShowEffectTimer(string id, string labelKey, float seconds)
+        {
+            if (!IsServer) return;
+            Core.EffectTimers.Start(id, labelKey, seconds);
+            Safe(() => ShowEffectTimerClientRpc(id, labelKey, seconds));
+        }
+
+        [ClientRpc]
+        private void ShowEffectTimerClientRpc(string id, string labelKey, float seconds)
+        {
+            if (IsServer) return;
+            Core.EffectTimers.Start(id, labelKey, seconds);
         }
 
         /// <summary>Resets the in-game day clock back to the morning start on every machine.</summary>

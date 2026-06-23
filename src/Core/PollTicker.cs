@@ -30,6 +30,7 @@ namespace ChatChaos.Core
 
             PollHud.EnsureExists();
             BerserkHud.EnsureExists();
+            EffectTimerHud.EnsureExists();
         }
 
         private void Update()
@@ -45,6 +46,7 @@ namespace ChatChaos.Core
             MicMute.Tick();
             SoundMute.Tick();
             WinterSale.Tick();
+            EffectTimers.Tick();
             TrackLanding();
         }
 

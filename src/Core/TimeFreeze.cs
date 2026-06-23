@@ -29,6 +29,7 @@ namespace ChatChaos.Core
             _active = true;
             _unfreezeTime = Time.time + seconds;
             n.SetTimeFrozen(true);
+            n.ShowEffectTimer("timefreeze", "fx.timefreeze", seconds);
             Plugin.Log.LogInfo($"ChatChaos: time freeze for {seconds:0}s.");
         }
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.43.0
+- On-screen countdowns: time-limited effects (Time frozen, Stamina, Ship locked, Fast &
+  Serious, Mic muted, Sound muted, Sale, Berserk) now show a top-left list with the
+  seconds remaining, on every player's screen. Synced to all.
+
 ## 0.42.0
 - Removed the leftover "random_teleport" placeholder event (it was an early example, not a
   real event) and the now-unused Placeholder helper.

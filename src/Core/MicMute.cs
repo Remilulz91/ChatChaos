@@ -1,4 +1,5 @@
 using ChatChaos.Logging;
+using ChatChaos.Networking;
 using UnityEngine;
 
 namespace ChatChaos.Core
@@ -30,6 +31,7 @@ namespace ChatChaos.Core
             _endTime = Time.time + seconds;
             _active = true;
             SetMuted(true);
+            ChatChaosNetworker.Active?.ShowEffectTimer("micmute", "fx.micmute", seconds);
             Log.Info("Mic", $"host mic muted for {seconds:0}s.");
         }
 

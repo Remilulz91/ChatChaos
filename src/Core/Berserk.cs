@@ -82,6 +82,7 @@ namespace ChatChaos.Core
                 _phaseEndTime = Time.time + BerserkDuration;
                 ChatChaosNetworker.Active?.SetBerserkPlayer(_pendingIndex);
                 ChatChaosNetworker.Active?.GiveBerserkShotgun(_pendingIndex);
+                ChatChaosNetworker.Active?.ShowEffectTimer("berserk", "fx.berserk", BerserkDuration);
                 Log.Info("Berserk", $"GO BERSERK — player index {_pendingIndex} invincible for {BerserkDuration:0}s.");
             }
             else // Active

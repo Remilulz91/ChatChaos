@@ -1,4 +1,5 @@
 using ChatChaos.Logging;
+using ChatChaos.Networking;
 using UnityEngine;
 
 namespace ChatChaos.Core
@@ -32,6 +33,7 @@ namespace ChatChaos.Core
             _endTime = Time.time + seconds;
             _active = true;
             AudioListener.volume = 0f;
+            ChatChaosNetworker.Active?.ShowEffectTimer("soundmute", "fx.soundmute", seconds);
             Log.Info("Sound", $"host game sound muted for {seconds:0}s.");
         }
 

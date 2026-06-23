@@ -62,6 +62,7 @@ namespace ChatChaos.Core
             MicMute.Reset();                // make sure the mic isn't left muted
             SoundMute.Reset();              // make sure game sound isn't left muted
             WinterSale.Reset();             // restore store prices if a sale was running
+            EffectTimers.Reset();           // clear any leftover countdowns
             TwitchClient.StartFromConfig();
         }
 

@@ -44,6 +44,7 @@ namespace ChatChaos.Core
             _active = true;
             _endTime = Time.time + seconds;
             n.SetWinterSale(seed);
+            n.ShowEffectTimer("sale", "fx.sale", seconds);
             Log.Info("Sale", $"winter sale started for {seconds:0}s (seed {seed}).");
         }
 
