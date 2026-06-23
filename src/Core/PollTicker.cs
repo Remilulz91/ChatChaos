@@ -43,6 +43,7 @@ namespace ChatChaos.Core
             BerserkShotgun.Tick();
             SpeedBoost.Tick();
             MicMute.Tick();
+            SoundMute.Tick();
             TrackLanding();
         }
 

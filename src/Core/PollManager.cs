@@ -60,6 +60,7 @@ namespace ChatChaos.Core
             Berserk.Reset();                // clear any leftover berserk state
             SpeedBoost.Reset();             // clear any leftover speed boost
             MicMute.Reset();                // make sure the mic isn't left muted
+            SoundMute.Reset();              // make sure game sound isn't left muted
             TwitchClient.StartFromConfig();
         }
 

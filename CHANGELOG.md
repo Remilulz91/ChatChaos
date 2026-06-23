@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.36.0
+- New event: "Mute sound (1m)" / "Coupe le son (1m)" — silences all game audio on the
+  host (game sounds + other players' voices) for 60 seconds, then restores it.
+  Host-local via AudioListener.volume.
+
 ## 0.35.0
 - New event: "Detonate all mines" / "Exploser toutes les mines" — instantly detonates
   every landmine on the map. Each machine detonates locally (as the game does per client).
