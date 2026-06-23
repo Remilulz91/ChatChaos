@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.21.0
+- "Lock doors": classic doors are now locked with the game's LockDoor() method (per
+  machine), so the padlock is shown to every player (instead of only setting the locked
+  state).
+
 ## 0.20.0
 - New events: "Unlock doors" / "Déverrouiller portes" and "Lock doors" / "Verrouiller
   portes". Unlock removes the lock from locked classic doors (no key needed; players open

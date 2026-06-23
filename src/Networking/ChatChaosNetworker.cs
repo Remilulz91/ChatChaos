@@ -360,7 +360,9 @@ namespace ChatChaos.Networking
                 else
                 {
                     // Lock only doors that aren't already open (and aren't already locked).
-                    if (!door.isDoorOpened && !door.isLocked) { door.isLocked = true; n++; }
+                    // LockDoor() sets the locked state AND shows the padlock (same method the
+                    // game uses), applied per-machine so everyone sees the padlock.
+                    if (!door.isDoorOpened && !door.isLocked) { door.LockDoor(); n++; }
                 }
             }
             if (n > 0) Plugin.Log.LogInfo($"ChatChaos: {(unlock ? "unlocked" : "locked")} {n} classic door(s).");
