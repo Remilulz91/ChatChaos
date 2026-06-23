@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.48.0
+- Fixed the cursor breaking in the menu/game: the HUD canvases no longer add a
+  GraphicRaycaster (they are display-only and were capturing mouse input).
+- Fixed the Netcode RPC errors ("NetworkBehaviour index 0 out of bounds for Doors" +
+  NullReferenceException): the network handler used a string-hash id that collided with a
+  vanilla object, mis-routing our RPCs. It now uses a fixed, distinctive id.
+
 ## 0.47.0
 - Polls are now limited to 2 per moon: one in the morning (after landing) and one in the
   afternoon (opens when the in-game clock reaches AfternoonPollTime, default 0.45).

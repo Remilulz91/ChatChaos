@@ -85,7 +85,7 @@ namespace ChatChaos.UI
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920, 1080);
             scaler.matchWidthOrHeight = 0.5f;
-            gameObject.AddComponent<GraphicRaycaster>();
+            // No GraphicRaycaster on purpose: display-only HUD, must not capture the cursor.
 
             var panelGo = new GameObject("Panel", typeof(RectTransform));
             panelGo.transform.SetParent(transform, false);

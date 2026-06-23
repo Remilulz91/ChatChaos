@@ -94,9 +94,13 @@ namespace ChatChaos.Networking
             }
         }
 
+        // A fixed, distinctive id for our network handler. A string hash collided with a
+        // vanilla object ("Doors"), which mis-routed our RPCs; a hardcoded unusual value
+        // makes a collision practically impossible.
+        private const uint HandlerHash = 0xC4A0_5E77u;
+
         private static void AssignStableHash(NetworkObject netObj, string key)
         {
-            uint hash = (uint)key.GetHashCode();
             var field = typeof(NetworkObject).GetField(
                 "GlobalObjectIdHash",
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
@@ -105,7 +109,8 @@ namespace ChatChaos.Networking
                 Plugin.Log.LogError("NetworkObjectManager: GlobalObjectIdHash field not found; spawn will likely fail.");
                 return;
             }
-            field.SetValue(netObj, hash);
+            field.SetValue(netObj, HandlerHash);
+            Plugin.Log.LogInfo($"NetworkObjectManager: GlobalObjectIdHash set to {HandlerHash} (for '{key}').");
         }
     }
 }
