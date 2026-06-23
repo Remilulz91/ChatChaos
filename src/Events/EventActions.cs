@@ -132,5 +132,18 @@ namespace ChatChaos.Events
             else
                 Plugin.Log.LogWarning("ChatChaos: scrap value change skipped (networker not ready).");
         }
+
+        /// <summary>
+        /// Sets the battery of every battery-powered item to <paramref name="charge"/>
+        /// (0 = empty, 1 = full). Flashlights, walkie-talkies, etc. Networked.
+        /// </summary>
+        public static void SetAllEquipmentBattery(float charge)
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+                n.SetBatteries(charge);
+            else
+                Plugin.Log.LogWarning("ChatChaos: battery change skipped (networker not ready).");
+        }
     }
 }

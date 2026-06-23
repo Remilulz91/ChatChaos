@@ -279,6 +279,41 @@ namespace ChatChaos.Networking
             Plugin.Log.LogInfo($"ChatChaos: scrap value {(percent >= 0 ? "+" : "")}{percent}% applied to {changed} item(s).");
         }
 
+        /// <summary>
+        /// Sets the battery charge (0..1) of every battery-powered item (flashlight, walkie,
+        /// etc.). Applied identically on every machine so the charge stays in sync.
+        /// </summary>
+        public void SetBatteries(float charge)
+        {
+            if (!IsServer) return;
+            ApplyBatteryChargeLocal(charge);
+            Safe(() => SetBatteriesClientRpc(charge));
+        }
+
+        [ClientRpc]
+        private void SetBatteriesClientRpc(float charge)
+        {
+            if (IsServer) return;
+            ApplyBatteryChargeLocal(charge);
+        }
+
+        private static void ApplyBatteryChargeLocal(float charge)
+        {
+            charge = Mathf.Clamp01(charge);
+            var items = UnityEngine.Object.FindObjectsOfType<GrabbableObject>();
+            int changed = 0;
+            foreach (var g in items)
+            {
+                if (g == null || g.itemProperties == null || !g.itemProperties.requiresBattery) continue;
+                if (g.insertedBattery == null) continue;
+
+                g.insertedBattery.charge = charge;
+                g.insertedBattery.empty = charge <= 0f;
+                changed++;
+            }
+            Plugin.Log.LogInfo($"ChatChaos: set battery to {Mathf.RoundToInt(charge * 100)}% on {changed} item(s).");
+        }
+
         private static void HealAllPlayersLocal()
         {
             var sor = StartOfRound.Instance;

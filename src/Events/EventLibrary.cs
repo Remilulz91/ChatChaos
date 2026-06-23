@@ -70,7 +70,10 @@ namespace ChatChaos.Events
             });
 
             EventRegistry.Add("recharge_gear", "Recharge equipment", "Recharge équipements", () =>
-                Placeholder("recharge_gear"));
+                EventActions.SetAllEquipmentBattery(1f));
+
+            EventRegistry.Add("discharge_gear", "Discharge equipment", "Décharge équipements", () =>
+                EventActions.SetAllEquipmentBattery(0f));
 
             EventRegistry.Add("power_outage", "Power outage", "Coupure de courant", () =>
                 Placeholder("power_outage"));

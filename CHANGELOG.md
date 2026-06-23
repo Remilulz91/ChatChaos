@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.19.0
+- New events: "Recharge equipment" / "Recharge équipements" (sets all battery items to
+  100%) and "Discharge equipment" / "Décharge équipements" (sets them to 0%). Affects
+  flashlights, walkie-talkies, etc. Synced to every player.
+
 ## 0.18.0
 - Event system now supports DYNAMIC events whose label and effect are rolled when the
   option is drawn (so the chat sees the exact value that will apply).
