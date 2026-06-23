@@ -91,6 +91,11 @@ namespace ChatChaos.Config
         /// <summary>Overall scale of the poll panel.</summary>
         public static ConfigEntry<float> HudScale = null!;
 
+        // ---------------- Debug ----------------
+
+        /// <summary>Write extra, detailed logs (every vote, every broadcast, etc.).</summary>
+        public static ConfigEntry<bool> VerboseLogging = null!;
+
         public static void Init(ConfigFile cfg)
         {
             // -- Twitch --
@@ -180,6 +185,12 @@ namespace ChatChaos.Config
             HudScale = cfg.Bind(
                 "Display", "PanelScale", 1.0f,
                 "Overall scale of the poll panel (1 = default size).");
+
+            // -- Debug --
+            VerboseLogging = cfg.Bind(
+                "Debug", "VerboseLogging", false,
+                "Write extra detailed logs (every vote, every network broadcast, etc.) to " +
+                "the BepInEx log. Turn on when hunting a bug; leave off for normal play.");
         }
 
         /// <summary>Effective account login (Username, or Channel if empty).</summary>

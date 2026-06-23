@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using ChatChaos.Config;
 using ChatChaos.Localization;
+using ChatChaos.Logging;
 using ChatChaos.Networking;
 using ChatChaos.Twitch;
 using ChatChaos.UI;
@@ -27,6 +28,7 @@ namespace ChatChaos.Core
         private static Phase _phase = Phase.Idle;
         private static bool _landed;
         private static bool _pollsThisMoon;
+        private static string _currentMoon = "?";
 
         private static float _nextPollTime;
         private static float _pollEndTime;
@@ -130,6 +132,7 @@ namespace ChatChaos.Core
 
             int delay = Mathf.RoundToInt(Mathf.Max(0f, ModConfig.PollDelayAfterLanding.Value));
             string moon = string.IsNullOrWhiteSpace(moonName) ? "?" : moonName.Trim();
+            _currentMoon = moon;
 
             // Clean slate: clear any leftover panel (a frozen/cancelled or result panel
             // still fading from a previous moon) before scheduling the next poll.
@@ -279,8 +282,9 @@ namespace ChatChaos.Core
             Announce(Loc.Get("chat.start"));
             Announce(Loc.Format("chat.options", Label(0), Label(1), Label(2)));
 
-            Plugin.Log.LogInfo($"ChatChaos: poll opened ({_options.Count} options, " +
-                               $"{ModConfig.PollDuration.Value:0}s).");
+            Log.Info("Poll", $"Opened on '{_currentMoon}' — options: " +
+                             $"[1) {Label(0)} | 2) {Label(1)} | 3) {Label(2)}] for " +
+                             $"{ModConfig.PollDuration.Value:0}s.");
         }
 
         private static void DrainVotes()
@@ -296,8 +300,13 @@ namespace ChatChaos.Core
                 if (choice < 1 || choice > _options.Count) continue;
 
                 // One vote per person: first vote counts, later ones are ignored.
-                if (!_voters.Add(line.User.ToLowerInvariant())) continue;
+                if (!_voters.Add(line.User.ToLowerInvariant()))
+                {
+                    Log.Debug("Poll", $"vote ignored (already voted): {line.User}");
+                    continue;
+                }
                 _counts[choice - 1]++;
+                Log.Debug("Poll", $"vote: {line.User} -> {choice} ('{Label(choice - 1)}')");
             }
         }
 
@@ -312,17 +321,27 @@ namespace ChatChaos.Core
             else
                 Announce(Loc.Format("chat.winner", Label(winner), winnerCount));
 
-            // Apply the winning event on the host.
-            try { _options[winner].Apply(); }
-            catch (Exception e) { Plugin.Log.LogError($"ChatChaos: event '{_options[winner].Id}' threw: {e}"); }
+            var ev = _options[winner];
+            Log.Info("Poll", $"Closed on '{_currentMoon}'. Winner: '{ev.Id}' ({ev.Label}) — " +
+                             $"{winnerCount} vote(s){(noVotes ? ", random (nobody voted)" : "")}.");
+
+            // Apply the winning event on the host (errors are isolated so one bad event
+            // can never crash the run — the log names exactly which event failed).
+            Log.Info("Event", $"Applying '{ev.Id}'...");
+            try
+            {
+                ev.Apply();
+                Log.Info("Event", $"'{ev.Id}' applied OK.");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Event", $"'{ev.Id}' FAILED to apply: {e}");
+            }
 
             UiEnd(winner, winnerCount);
 
             _resultEndTime = Time.time + Mathf.Max(1f, ModConfig.ResultDisplayDuration.Value);
             _phase = Phase.Result;
-
-            Plugin.Log.LogInfo($"ChatChaos: winner = '{_options[winner].Id}' ({winnerCount} votes" +
-                               (noVotes ? ", random — nobody voted)." : ")."));
         }
 
         /// <summary>Highest count wins; ties broken randomly; no votes -> fully random.</summary>

@@ -92,6 +92,7 @@ All options live in `BepInEx/config/Remilulz_91.ChatChaos.cfg`:
 | Display | `Language` | `Auto` | `Auto`, `English` or `French`. |
 | Display | `PanelAnchorX/Y` | `0.30 / 0.22` | Panel position (0–1 across the screen). |
 | Display | `PanelScale` | `1.0` | Panel size. |
+| Debug | `VerboseLogging` | `false` | Extra detailed logs (every vote, every broadcast) for debugging. |
 
 ---
 

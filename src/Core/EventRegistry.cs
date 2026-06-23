@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ChatChaos.Events;
+using ChatChaos.Logging;
 
 namespace ChatChaos.Core
 {
@@ -68,7 +69,8 @@ namespace ChatChaos.Core
         {
             _defs.Clear();
             EventLibrary.RegisterAll();
-            Plugin.Log.LogInfo($"EventRegistry: {_defs.Count} event(s) loaded.");
+            Log.Info("Init", $"{_defs.Count} event(s) loaded: " +
+                             string.Join(", ", _defs.ConvertAll(d => d.Id)));
         }
 
         /// <summary>

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.29.0
+- Logging system: centralised, tagged logs ([ChatChaos][Poll], [ChatChaos][Event], ...).
+  Poll open/close now logs the moon and the 3 options; the winning event logs Applying ->
+  OK/FAILED with the exact event id, so a failing event is easy to spot. Startup logs the
+  full list of loaded events. New config Debug/VerboseLogging for per-vote / per-broadcast
+  detail when hunting a bug.
+
 ## 0.28.0
 - New events: "Turn power on" / "Allumer courant" and "Turn power off" / "Eteindre
   courant" — control the facility (dungeon) power. The breaker method is called by
