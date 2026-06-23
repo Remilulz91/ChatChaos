@@ -39,8 +39,8 @@ namespace ChatChaos.Events
             EventRegistry.Add("random_death", "Random death", "Mort aléatoire", () =>
                 EventActions.KillRandomAlivePlayer());
 
-            EventRegistry.Add("drop_items", "Drop items", "Drop objets", () =>
-                Placeholder("drop_items"));
+            EventRegistry.Add("drop_items", "Items dropped", "Objets lâchés", () =>
+                EventActions.DropAllItemsFromLivingPlayers());
 
             EventRegistry.Add("one_hp", "1 HP", "1 HP", () =>
                 Placeholder("one_hp"));

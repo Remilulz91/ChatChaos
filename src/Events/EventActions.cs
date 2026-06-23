@@ -53,5 +53,25 @@ namespace ChatChaos.Events
                     t.KillPlayer(Vector3.zero, true, CauseOfDeath.Unknown, 0, default);
             }
         }
+
+        /// <summary>
+        /// Every LIVING player drops all the items they hold. Dead players are not
+        /// affected. Networked: each machine drops its own player's items.
+        /// </summary>
+        public static void DropAllItemsFromLivingPlayers()
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+            {
+                n.DropAllItems();
+                return;
+            }
+
+            // Fallback (no networker, e.g. very early/solo): drop our own items.
+            var sor = StartOfRound.Instance;
+            var p = sor != null ? sor.localPlayerController : null;
+            if (p != null && p.isPlayerControlled && !p.isPlayerDead)
+                p.DropAllHeldItems(true, false);
+        }
     }
 }

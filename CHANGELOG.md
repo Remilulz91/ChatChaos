@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.14.0
+- New event: "Items dropped" / "Objets lâchés" — every living player drops all the items
+  they hold (dead players are unaffected). Networked: each machine drops its own player's
+  items so the drops sync correctly.
+
 ## 0.13.0
 - First real event implemented: "Random death" / "Mort aléatoire" now kills one random
   LIVING player (dead players and empty slots are excluded). Networked so the death is

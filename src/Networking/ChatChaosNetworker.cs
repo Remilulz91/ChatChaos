@@ -136,6 +136,35 @@ namespace ChatChaos.Networking
             target.KillPlayer(Vector3.zero, true, CauseOfDeath.Unknown, 0, default);
         }
 
+        /// <summary>
+        /// Makes every LIVING player drop all the items they hold. Each machine drops its
+        /// own player's items (the owner), so the drops sync correctly.
+        /// </summary>
+        public void DropAllItems()
+        {
+            if (!IsServer) return;
+            DropLocalPlayerItems();                       // host's own player
+            Safe(() => DropAllItemsClientRpc());          // every other player
+        }
+
+        [ClientRpc]
+        private void DropAllItemsClientRpc()
+        {
+            if (IsServer) return;   // host already dropped its own
+            DropLocalPlayerItems();
+        }
+
+        private static void DropLocalPlayerItems()
+        {
+            var sor = StartOfRound.Instance;
+            if (sor == null) return;
+
+            var p = sor.localPlayerController;
+            if (p == null || !p.isPlayerControlled || p.isPlayerDead) return;
+
+            p.DropAllHeldItems(true, false);
+        }
+
         [ClientRpc]
         private void StartPollClientRpc(string l0, string l1, string l2, float duration)
         {
