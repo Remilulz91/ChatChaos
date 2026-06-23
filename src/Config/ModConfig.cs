@@ -91,6 +91,12 @@ namespace ChatChaos.Config
         /// <summary>Overall scale of the poll panel.</summary>
         public static ConfigEntry<float> HudScale = null!;
 
+        /// <summary>Horizontal position of the effect-countdown panel (0 = left, 1 = right).</summary>
+        public static ConfigEntry<float> TimerAnchorX = null!;
+
+        /// <summary>Vertical position of the effect-countdown panel (0 = bottom, 1 = top).</summary>
+        public static ConfigEntry<float> TimerAnchorY = null!;
+
         // ---------------- Debug ----------------
 
         /// <summary>Write extra, detailed logs (every vote, every broadcast, etc.).</summary>
@@ -185,6 +191,16 @@ namespace ChatChaos.Config
             HudScale = cfg.Bind(
                 "Display", "PanelScale", 1.0f,
                 "Overall scale of the poll panel (1 = default size).");
+
+            TimerAnchorX = cfg.Bind(
+                "Display", "TimerPanelAnchorX", 0.985f,
+                "Horizontal position of the effect-countdown panel (0 = far left, 1 = far right). " +
+                "Default right edge.");
+
+            TimerAnchorY = cfg.Bind(
+                "Display", "TimerPanelAnchorY", 0.5f,
+                "Vertical position of the effect-countdown panel (0 = bottom, 1 = top). " +
+                "Default vertical centre.");
 
             // -- Debug --
             VerboseLogging = cfg.Bind(

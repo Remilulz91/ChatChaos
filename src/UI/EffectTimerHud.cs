@@ -1,4 +1,5 @@
 using System.Text;
+using ChatChaos.Config;
 using ChatChaos.Core;
 using UnityEngine;
 using UnityEngine.UI;
@@ -55,20 +56,24 @@ namespace ChatChaos.UI
             scaler.matchWidthOrHeight = 0.5f;
             gameObject.AddComponent<GraphicRaycaster>();
 
+            // Configurable position; default = right edge, vertically centred.
+            float ax = Mathf.Clamp01(ModConfig.TimerAnchorX.Value);
+            float ay = Mathf.Clamp01(ModConfig.TimerAnchorY.Value);
+            bool right = ax > 0.5f;
+
             var go = new GameObject("Text", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text), typeof(Outline));
             go.transform.SetParent(transform, false);
             var rt = (RectTransform)go.transform;
-            rt.anchorMin = new Vector2(0, 1);
-            rt.anchorMax = new Vector2(0, 1);
-            rt.pivot = new Vector2(0, 1);
+            rt.anchorMin = rt.anchorMax = new Vector2(ax, ay);
+            rt.pivot = new Vector2(ax, 1f);                // grow downward from the anchor
             rt.sizeDelta = new Vector2(520, 400);
-            rt.anchoredPosition = new Vector2(24, -120);   // top-left, below the game's top HUD
+            rt.anchoredPosition = new Vector2(right ? -20f : 20f, 0f);
 
             _text = go.GetComponent<Text>();
             _text.font = GetFont();
             _text.fontSize = 24;
             _text.fontStyle = FontStyle.Bold;
-            _text.alignment = TextAnchor.UpperLeft;
+            _text.alignment = right ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
             _text.color = TextColor;
             _text.horizontalOverflow = HorizontalWrapMode.Overflow;
             _text.verticalOverflow = VerticalWrapMode.Overflow;

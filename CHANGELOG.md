@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.44.0
+- Moved the effect-countdown panel to the right edge (vertically centred) so it no longer
+  overlaps the vanilla top-left HUD (stamina/weight). Position is now configurable via
+  Display/TimerPanelAnchorX-Y.
+
 ## 0.43.0
 - On-screen countdowns: time-limited effects (Time frozen, Stamina, Ship locked, Fast &
   Serious, Mic muted, Sound muted, Sale, Berserk) now show a top-left list with the
