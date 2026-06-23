@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.34.0
+- New event: "Mute mic (1m)" / "Coupe le micro (1m)" — mutes the host's in-game voice
+  (Dissonance) for 60 seconds, then unmutes. Host-local (no networking); done via
+  reflection so it doesn't compile-depend on the Dissonance assembly.
+
 ## 0.33.0
 - New event: "Fast & Serious (30s)" — boosts every player's movement speed (x1.8) for 30
   seconds, then restores the normal speed. Per-player, synced to all.

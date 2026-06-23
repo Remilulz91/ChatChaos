@@ -105,6 +105,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("fast_serious", "Fast & Serious (30s)", "Fast & Serious (30s)", () =>
                 EventActions.BoostSpeed(30f));
 
+            EventRegistry.Add("mute_mic", "Mute mic (1m)", "Coupe le micro (1m)", () =>
+                Core.MicMute.Mute(60f));
+
             EventRegistry.Add("power_on", "Turn power on", "Allumer courant", () =>
                 EventActions.SetFacilityPower(true));
 
