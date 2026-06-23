@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.20.0
+- New events: "Unlock doors" / "Déverrouiller portes" and "Lock doors" / "Verrouiller
+  portes". Unlock removes the lock from locked classic doors (no key needed; players open
+  them by hand) and opens the big metal terminal doors. Lock locks classic doors that
+  aren't open and closes the big metal doors (reopenable from the terminal). Adapts to the
+  dungeon (e.g. the manor has only classic doors). Synced to every player.
+
 ## 0.19.0
 - New events: "Recharge equipment" / "Recharge équipements" (sets all battery items to
   100%) and "Discharge equipment" / "Décharge équipements" (sets them to 0%). Affects

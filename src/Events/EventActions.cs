@@ -145,5 +145,19 @@ namespace ChatChaos.Events
             else
                 Plugin.Log.LogWarning("ChatChaos: battery change skipped (networker not ready).");
         }
+
+        /// <summary>
+        /// Unlocks/opens (unlock = true) or locks/closes (unlock = false) the level's doors.
+        /// Adapts to the dungeon (classic DoorLock doors everywhere; big metal terminal doors
+        /// only where they exist). Networked.
+        /// </summary>
+        public static void SetAllDoors(bool unlock)
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+                n.SetDoors(unlock);
+            else
+                Plugin.Log.LogWarning("ChatChaos: door change skipped (networker not ready).");
+        }
     }
 }

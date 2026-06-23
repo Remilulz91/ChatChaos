@@ -314,6 +314,58 @@ namespace ChatChaos.Networking
             Plugin.Log.LogInfo($"ChatChaos: set battery to {Mathf.RoundToInt(charge * 100)}% on {changed} item(s).");
         }
 
+        /// <summary>
+        /// Unlocks/opens (unlock=true) or locks/closes (unlock=false) the level's doors.
+        /// Big metal terminal doors are handled host-authoritatively via the game's own
+        /// RPC; classic DoorLock doors are mirrored to every player. Adapts to the dungeon
+        /// (acts only on the door types that exist).
+        /// </summary>
+        public void SetDoors(bool unlock)
+        {
+            if (!IsServer) return;
+            ApplyBigDoorsHost(unlock);            // big terminal doors (sync themselves)
+            ApplyClassicDoorsLocal(unlock);       // host's own classic doors
+            Safe(() => ClassicDoorsClientRpc(unlock));
+        }
+
+        [ClientRpc]
+        private void ClassicDoorsClientRpc(bool unlock)
+        {
+            if (IsServer) return;
+            ApplyClassicDoorsLocal(unlock);
+        }
+
+        private static void ApplyBigDoorsHost(bool unlock)
+        {
+            int n = 0;
+            foreach (var tao in UnityEngine.Object.FindObjectsOfType<TerminalAccessibleObject>())
+            {
+                if (tao == null || !tao.isBigDoor) continue;
+                tao.SetDoorOpenServerRpc(unlock);   // unlock -> open, lock -> close
+                n++;
+            }
+            if (n > 0) Plugin.Log.LogInfo($"ChatChaos: {(unlock ? "opened" : "closed")} {n} big door(s).");
+        }
+
+        private static void ApplyClassicDoorsLocal(bool unlock)
+        {
+            int n = 0;
+            foreach (var door in UnityEngine.Object.FindObjectsOfType<DoorLock>())
+            {
+                if (door == null) continue;
+                if (unlock)
+                {
+                    if (door.isLocked) { door.UnlockDoor(); n++; }   // no key needed; player opens by hand
+                }
+                else
+                {
+                    // Lock only doors that aren't already open (and aren't already locked).
+                    if (!door.isDoorOpened && !door.isLocked) { door.isLocked = true; n++; }
+                }
+            }
+            if (n > 0) Plugin.Log.LogInfo($"ChatChaos: {(unlock ? "unlocked" : "locked")} {n} classic door(s).");
+        }
+
         private static void HealAllPlayersLocal()
         {
             var sor = StartOfRound.Instance;

@@ -75,6 +75,12 @@ namespace ChatChaos.Events
             EventRegistry.Add("discharge_gear", "Discharge equipment", "Décharge équipements", () =>
                 EventActions.SetAllEquipmentBattery(0f));
 
+            EventRegistry.Add("unlock_doors", "Unlock doors", "Déverrouiller portes", () =>
+                EventActions.SetAllDoors(true));
+
+            EventRegistry.Add("lock_doors", "Lock doors", "Verrouiller portes", () =>
+                EventActions.SetAllDoors(false));
+
             EventRegistry.Add("power_outage", "Power outage", "Coupure de courant", () =>
                 Placeholder("power_outage"));
 
