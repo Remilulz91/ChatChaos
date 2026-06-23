@@ -657,6 +657,90 @@ namespace ChatChaos.Networking
             Core.Berserk.SetActivePlayer(index);
         }
 
+        private static GrabbableObject? _hostBerserkShotgun;
+
+        /// <summary>Host: spawn a shotgun and give it to player[index] (the berserk player).</summary>
+        public void GiveBerserkShotgun(int index)
+        {
+            if (!IsServer) return;
+            var sor = StartOfRound.Instance;
+            if (sor == null || sor.allPlayerScripts == null ||
+                index < 0 || index >= sor.allPlayerScripts.Length) return;
+
+            var item = FindShotgunItem();
+            if (item == null || item.spawnPrefab == null)
+            {
+                Plugin.Log.LogWarning("[ChatChaos][Berserk] shotgun item not found in the item list.");
+                return;
+            }
+
+            var player = sor.allPlayerScripts[index];
+            var go = UnityEngine.Object.Instantiate(item.spawnPrefab,
+                player.transform.position + Vector3.up * 0.6f, Quaternion.identity);
+
+            var grab = go.GetComponent<GrabbableObject>();
+            var netObj = go.GetComponent<NetworkObject>();
+            if (grab == null || netObj == null)
+            {
+                Plugin.Log.LogWarning("[ChatChaos][Berserk] shotgun prefab missing GrabbableObject/NetworkObject.");
+                UnityEngine.Object.Destroy(go);
+                return;
+            }
+
+            try { grab.fallTime = 1f; } catch { }
+            netObj.Spawn();
+            _hostBerserkShotgun = grab;
+            Plugin.Log.LogInfo($"[ChatChaos][Berserk] shotgun spawned for player index {index}.");
+
+            Safe(() => GiveShotgunClientRpc(new NetworkObjectReference(netObj), index));
+        }
+
+        // Runs on EVERY machine (incl. host): only the target's owner actually grabs it.
+        [ClientRpc]
+        private void GiveShotgunClientRpc(NetworkObjectReference reference, int index)
+        {
+            if (!reference.TryGet(out var netObj)) return;
+            var grab = netObj.GetComponent<GrabbableObject>();
+            var sor = StartOfRound.Instance;
+            if (grab == null || sor == null || sor.allPlayerScripts == null ||
+                index < 0 || index >= sor.allPlayerScripts.Length) return;
+
+            var player = sor.allPlayerScripts[index];
+            if (player != sor.localPlayerController) return;   // only the owner grabs
+            Core.BerserkShotgun.GrabAndHold(player, grab);
+        }
+
+        /// <summary>Host: remove the berserk shotgun (despawn it) and clear the ammo loop.</summary>
+        public void RemoveBerserkShotgun()
+        {
+            if (!IsServer) return;
+            if (_hostBerserkShotgun != null)
+            {
+                var no = _hostBerserkShotgun.GetComponent<NetworkObject>();
+                if (no != null && no.IsSpawned) no.Despawn(true);
+                _hostBerserkShotgun = null;
+            }
+            Core.BerserkShotgun.Clear();
+            Safe(() => ClearShotgunHoldClientRpc());
+        }
+
+        [ClientRpc]
+        private void ClearShotgunHoldClientRpc()
+        {
+            if (IsServer) return;
+            Core.BerserkShotgun.Clear();
+        }
+
+        private static Item? FindShotgunItem()
+        {
+            var sor = StartOfRound.Instance;
+            if (sor == null || sor.allItemsList == null || sor.allItemsList.itemsList == null) return null;
+            foreach (var it in sor.allItemsList.itemsList)
+                if (it != null && it.spawnPrefab != null && it.spawnPrefab.GetComponent<ShotgunItem>() != null)
+                    return it;
+            return null;
+        }
+
         private static void ToggleWeatherEffects(object tod, int activeIndex)
         {
             try

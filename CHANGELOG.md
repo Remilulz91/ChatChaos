@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.32.0
+- Berserk part 2: the berserk player now also gets a SHOTGUN with unlimited ammo for the
+  45s. If the inventory is full, the currently held item is dropped to make room. The
+  shotgun is removed (despawned) when berserk ends. Shells are kept topped up for
+  unlimited fire.
+
 ## 0.31.0
 - New event: "Berserk (45s)" — part 1 (core). When it wins, a "RECEIVING SIGNAL -> GO
   BERSERK" overlay types out on screen; once it finishes, a random living player becomes

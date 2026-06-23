@@ -33,6 +33,7 @@ namespace ChatChaos.Core
             _activeIndex = -1;
             _phase = Phase.Idle;
             _pendingIndex = -1;
+            BerserkShotgun.Clear();
         }
 
         /// <summary>Set the invincible player on THIS machine (from the networker). -1 = none.</summary>
@@ -80,16 +81,16 @@ namespace ChatChaos.Core
                 _phase = Phase.Active;
                 _phaseEndTime = Time.time + BerserkDuration;
                 ChatChaosNetworker.Active?.SetBerserkPlayer(_pendingIndex);
+                ChatChaosNetworker.Active?.GiveBerserkShotgun(_pendingIndex);
                 Log.Info("Berserk", $"GO BERSERK — player index {_pendingIndex} invincible for {BerserkDuration:0}s.");
-                // TODO (next version): give the shotgun + unlimited ammo.
             }
             else // Active
             {
                 _phase = Phase.Idle;
                 ChatChaosNetworker.Active?.SetBerserkPlayer(-1);
+                ChatChaosNetworker.Active?.RemoveBerserkShotgun();
                 _pendingIndex = -1;
                 Log.Info("Berserk", "berserk ended.");
-                // TODO (next version): remove the shotgun.
             }
         }
 
