@@ -205,5 +205,40 @@ namespace ChatChaos.Events
             else
                 Plugin.Log.LogWarning("ChatChaos: power change skipped (networker not ready).");
         }
+
+        /// <summary>
+        /// Picks a random weather from the CURRENT moon's possible weathers (prefers one
+        /// different from the current weather) and applies it for everyone. Networked.
+        /// </summary>
+        public static void TriggerRandomWeather()
+        {
+            var level = StartOfRound.Instance != null ? StartOfRound.Instance.currentLevel : null;
+            if (level == null)
+            {
+                Plugin.Log.LogWarning("[ChatChaos][Weather] no current moon — weather skipped.");
+                return;
+            }
+
+            // Build the candidate list from the moon's possible weathers (+ clear).
+            var candidates = new List<LevelWeatherType> { LevelWeatherType.None };
+            if (level.randomWeathers != null)
+                foreach (var rw in level.randomWeathers)
+                    if (rw != null && !candidates.Contains(rw.weatherType))
+                        candidates.Add(rw.weatherType);
+
+            // Prefer a change: drop the current weather if there's an alternative.
+            if (candidates.Count > 1)
+                candidates.Remove(level.currentWeather);
+
+            var chosen = candidates[Random.Range(0, candidates.Count)];
+            Plugin.Log.LogInfo($"[ChatChaos][Weather] '{level.PlanetName}': chose {chosen} " +
+                               $"from {candidates.Count} candidate(s).");
+
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+                n.SetWeather((int)chosen);
+            else
+                Plugin.Log.LogWarning("[ChatChaos][Weather] networker not ready — weather skipped.");
+        }
     }
 }

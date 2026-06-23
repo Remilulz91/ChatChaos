@@ -96,6 +96,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("revive_team", "Team revive", "Résurrection équipe", () =>
                 EventActions.ReviveDeadTeam());
 
+            EventRegistry.Add("weather_random", "Random weather", "Météo aléatoire", () =>
+                EventActions.TriggerRandomWeather());
+
             EventRegistry.Add("power_on", "Turn power on", "Allumer courant", () =>
                 EventActions.SetFacilityPower(true));
 

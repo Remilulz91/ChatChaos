@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.30.0
+- New event: "Random weather" / "Météo aléatoire" — picks a random weather from the
+  current moon's possible weathers (prefers a change) and applies it. Visual effects
+  (fog/rain/eclipse) are toggled best-effort; flooding/eclipse spawns are load-time and
+  won't fully change mid-round. Synced to all.
+
 ## 0.29.0
 - Logging system: centralised, tagged logs ([ChatChaos][Poll], [ChatChaos][Event], ...).
   Poll open/close now logs the moon and the 3 options; the winning event logs Applying ->

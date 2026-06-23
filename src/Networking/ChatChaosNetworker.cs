@@ -589,6 +589,72 @@ namespace ChatChaos.Networking
             return false;
         }
 
+        /// <summary>
+        /// Applies a weather type (by its LevelWeatherType int) on every machine: sets the
+        /// level's weather and toggles the matching visual effect. Effects are toggled by
+        /// reflection so the build can't break on a field-name difference.
+        /// </summary>
+        public void SetWeather(int weather)
+        {
+            if (!IsServer) return;
+            ApplyWeatherLocal(weather);
+            Safe(() => SetWeatherClientRpc(weather));
+        }
+
+        [ClientRpc]
+        private void SetWeatherClientRpc(int weather)
+        {
+            if (IsServer) return;
+            ApplyWeatherLocal(weather);
+        }
+
+        private static void ApplyWeatherLocal(int weather)
+        {
+            var w = (LevelWeatherType)weather;
+
+            var sor = StartOfRound.Instance;
+            if (sor != null && sor.currentLevel != null)
+                sor.currentLevel.currentWeather = w;
+
+            var tod = TimeOfDay.Instance;
+            if (tod != null)
+            {
+                try { HarmonyLib.Traverse.Create(tod).Field("currentLevelWeather").SetValue(w); }
+                catch { /* field name differs; not fatal */ }
+                ToggleWeatherEffects(tod, weather);
+            }
+
+            Plugin.Log.LogInfo($"[ChatChaos][Weather] applied '{w}'.");
+        }
+
+        private static void ToggleWeatherEffects(object tod, int activeIndex)
+        {
+            try
+            {
+                var effects = HarmonyLib.Traverse.Create(tod).Field("effects").GetValue() as System.Array;
+                if (effects == null) return;
+
+                for (int i = 0; i < effects.Length; i++)
+                {
+                    var eff = effects.GetValue(i);
+                    if (eff == null) continue;
+
+                    bool active = (i == activeIndex);   // activeIndex = -1 (None) -> all off
+                    try { HarmonyLib.Traverse.Create(eff).Field("effectEnabled").SetValue(active); } catch { }
+
+                    var obj = HarmonyLib.Traverse.Create(eff).Field("effectObject").GetValue() as UnityEngine.GameObject;
+                    if (obj != null) obj.SetActive(active);
+
+                    var pObj = HarmonyLib.Traverse.Create(eff).Field("effectPermanentObject").GetValue() as UnityEngine.GameObject;
+                    if (pObj != null) pObj.SetActive(active);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Plugin.Log.LogWarning($"[ChatChaos][Weather] effect toggle failed: {e.Message}");
+            }
+        }
+
         private static void HealAllPlayersLocal()
         {
             var sor = StartOfRound.Instance;
