@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.25.0
+- "Stamina boost (1m)" is now BOOSTED (not unlimited): a flat per-second top-up makes the
+  sprint meter drain slower and regenerate faster for 60s, while staying limited.
+
 ## 0.24.0
 - New event: "Stamina boost (1m)" / "Stamina boostée (1m)" — unlimited sprint stamina for
   every player for 60 seconds (the sprint meter is kept full). Per-player, synced to all.
