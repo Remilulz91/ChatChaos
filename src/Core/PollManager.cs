@@ -23,11 +23,12 @@ namespace ChatChaos.Core
     /// </summary>
     public static class PollManager
     {
-        private enum Phase { Idle, Scheduled, Voting, Result, Cancelled }
+        private enum Phase { Idle, Scheduled, Voting, Result, Cancelled, WaitAfternoon }
 
         private static Phase _phase = Phase.Idle;
         private static bool _landed;
         private static bool _pollsThisMoon;
+        private static int _pollsThisMoonCount;
         private static string _currentMoon = "?";
 
         private static float _nextPollTime;
@@ -146,8 +147,9 @@ namespace ChatChaos.Core
             UiHide();
 
             _pollsThisMoon = true;
+            _pollsThisMoonCount = 0;
             _nextPollTime = Time.time + delay;
-            _phase = Phase.Scheduled;
+            _phase = Phase.Scheduled;   // poll 1 (morning)
 
             // Chat + on-screen confirmation (also a live "is the sync working?" check).
             Announce(Loc.Format("chat.landed", moon, delay));
@@ -181,6 +183,7 @@ namespace ChatChaos.Core
                     break;
 
                 case Phase.Scheduled:
+                case Phase.WaitAfternoon:
                     _phase = Phase.Idle;   // poll not shown yet, nothing to freeze
                     break;
 
@@ -230,13 +233,17 @@ namespace ChatChaos.Core
                     if (Time.time >= _resultEndTime)
                     {
                         UiHide();
-                        if (_landed && ModConfig.PollRepeatInterval.Value > 0f && EventRegistry.Count > 0)
-                        {
-                            _nextPollTime = Time.time + ModConfig.PollRepeatInterval.Value;
-                            _phase = Phase.Scheduled;
-                        }
-                        else _phase = Phase.Idle;
+                        // If we still have a poll left for this moon, wait for the afternoon
+                        // (the in-game clock) to open it; otherwise we're done for this moon.
+                        if (_landed && _pollsThisMoonCount < ModConfig.PollsPerDay.Value && EventRegistry.Count > 0)
+                            _phase = Phase.WaitAfternoon;
+                        else
+                            _phase = Phase.Idle;
                     }
+                    break;
+
+                case Phase.WaitAfternoon:
+                    if (_landed && IsAfternoon()) StartPoll();   // poll 2 (afternoon)
                     break;
 
                 case Phase.Cancelled:
@@ -271,6 +278,14 @@ namespace ChatChaos.Core
             ShowTip(Loc.Get("tip.connected.header"), body);
         }
 
+        /// <summary>True once the in-game clock has reached the afternoon threshold.</summary>
+        private static bool IsAfternoon()
+        {
+            var tod = TimeOfDay.Instance;
+            if (tod == null) return false;
+            return tod.normalizedTimeOfDay >= ModConfig.AfternoonPollTime.Value;
+        }
+
         private static void StartPoll()
         {
             _options = EventRegistry.PickRandom(3);
@@ -282,6 +297,7 @@ namespace ChatChaos.Core
             _pollEndTime = Time.time + Mathf.Max(5f, ModConfig.PollDuration.Value);
             _lastCountsBroadcast = 0f;
             _phase = Phase.Voting;
+            _pollsThisMoonCount++;
 
             UiStart();
 

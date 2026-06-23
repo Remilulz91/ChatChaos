@@ -81,7 +81,8 @@ All options live in `BepInEx/config/Remilulz_91.ChatChaos.cfg`:
 | Twitch | `UseSSL` | `false` | Connect over TLS (port 6697) instead of 6667. |
 | Poll | `DelayAfterLanding` | `45` | Seconds after landing before the first poll. |
 | Poll | `Duration` | `60` | Voting time in seconds. |
-| Poll | `RepeatInterval` | `0` | Seconds between polls on the same moon. `0` = one poll per landing. |
+| Poll | `PollsPerMoon` | `2` | Polls per moon (morning + afternoon). |
+| Poll | `AfternoonPollTime` | `0.45` | In-game time (0–1) the afternoon poll opens. |
 | Poll | `ResultDisplayDuration` | `6` | How long the winner panel stays up. |
 | Poll | `SkipCompanyMoon` | `true` | No polls on the safe Company moon. |
 | Poll | `RequireConnectedAccount` | `false` | If on, polls only run when a chat account is connected. |

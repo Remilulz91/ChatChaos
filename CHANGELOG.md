@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.47.0
+- Polls are now limited to 2 per moon: one in the morning (after landing) and one in the
+  afternoon (opens when the in-game clock reaches AfternoonPollTime, default 0.45).
+  Replaces the old RepeatInterval. Both configurable (Poll/PollsPerMoon, AfternoonPollTime).
+
 ## 0.46.0
 - Non-stackable events: an event that is active/pending is no longer proposed again until
   it ends. Double or Nothing stays excluded until it resolves at the Company; the timed

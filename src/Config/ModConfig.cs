@@ -47,12 +47,14 @@ namespace ChatChaos.Config
         /// <summary>How many seconds a poll stays open for voting.</summary>
         public static ConfigEntry<float> PollDuration = null!;
 
+        /// <summary>How many polls to run per moon (default 2: one morning, one afternoon).</summary>
+        public static ConfigEntry<int> PollsPerDay = null!;
+
         /// <summary>
-        /// Seconds between polls while on the same moon. 0 = only ONE poll per
-        /// landing (the default, matching the original design). Set e.g. 150 to keep
-        /// the chaos going with a fresh poll every 150s until the ship leaves.
+        /// In-game time (0 = morning start, 1 = end of day) at which the afternoon poll
+        /// opens. Default 0.45 (early-mid afternoon).
         /// </summary>
-        public static ConfigEntry<float> PollRepeatInterval = null!;
+        public static ConfigEntry<float> AfternoonPollTime = null!;
 
         /// <summary>Seconds the result panel (winner) stays on screen after a poll.</summary>
         public static ConfigEntry<float> ResultDisplayDuration = null!;
@@ -137,10 +139,15 @@ namespace ChatChaos.Config
                 "Poll", "Duration", 60f,
                 "How long a poll stays open for voting, in seconds.");
 
-            PollRepeatInterval = cfg.Bind(
-                "Poll", "RepeatInterval", 0f,
-                "Seconds between polls on the same moon. 0 = a single poll per landing. " +
-                "Set e.g. 150 to run a new poll repeatedly until the ship leaves.");
+            PollsPerDay = cfg.Bind(
+                "Poll", "PollsPerMoon", 2,
+                "How many polls to run per moon. Default 2: one in the morning (after landing) " +
+                "and one in the afternoon.");
+
+            AfternoonPollTime = cfg.Bind(
+                "Poll", "AfternoonPollTime", 0.45f,
+                "In-game time at which the afternoon poll opens (0 = morning start, 1 = end of " +
+                "day). Default 0.45 (early-mid afternoon).");
 
             ResultDisplayDuration = cfg.Bind(
                 "Poll", "ResultDisplayDuration", 10f,
