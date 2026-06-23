@@ -93,6 +93,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("ship_locked", "Ship locked (30s)", "Vaisseau bloqué (30s)", () =>
                 Core.ShipLock.Lock(30f));
 
+            EventRegistry.Add("revive_team", "Team revive", "Résurrection équipe", () =>
+                EventActions.ReviveDeadTeam());
+
             EventRegistry.Add("power_outage", "Power outage", "Coupure de courant", () =>
                 Placeholder("power_outage"));
 

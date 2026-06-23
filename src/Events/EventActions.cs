@@ -182,5 +182,18 @@ namespace ChatChaos.Events
             else
                 Plugin.Log.LogWarning("ChatChaos: stamina boost skipped (networker not ready).");
         }
+
+        /// <summary>
+        /// Revives all dead players (teleported back to the ship). Living players are left
+        /// where they are. Networked.
+        /// </summary>
+        public static void ReviveDeadTeam()
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+                n.ReviveTeam();
+            else
+                StartOfRound.Instance?.ReviveDeadPlayers();
+        }
     }
 }

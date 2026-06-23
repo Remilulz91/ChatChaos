@@ -512,6 +512,33 @@ namespace ChatChaos.Networking
             Plugin.Log.LogInfo($"ChatChaos: ship {(locked ? "locked (door closed, lever blocked)" : "unlocked")}.");
         }
 
+        /// <summary>
+        /// Revives all DEAD players and teleports them back to the ship (the game's own
+        /// ReviveDeadPlayers does exactly this and leaves living players where they are).
+        /// Run on every machine, matching how the game itself revives on the ship-leave.
+        /// </summary>
+        public void ReviveTeam()
+        {
+            if (!IsServer) return;
+            ApplyReviveLocal();
+            Safe(() => ReviveTeamClientRpc());
+        }
+
+        [ClientRpc]
+        private void ReviveTeamClientRpc()
+        {
+            if (IsServer) return;
+            ApplyReviveLocal();
+        }
+
+        private static void ApplyReviveLocal()
+        {
+            var sor = StartOfRound.Instance;
+            if (sor == null) return;
+            sor.ReviveDeadPlayers();
+            Plugin.Log.LogInfo("ChatChaos: revived dead players (teleported to the ship).");
+        }
+
         private static void HealAllPlayersLocal()
         {
             var sor = StartOfRound.Instance;

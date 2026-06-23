@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.27.0
+- New event: "Team revive" / "Résurrection équipe" — revives all dead players and
+  teleports them back to the ship (via the game's ReviveDeadPlayers). Living players are
+  left where they are. Synced to all.
+
 ## 0.26.0
 - New event: "Ship locked (30s)" / "Vaisseau bloqué (30s)" — closes the hangar door and
   blocks the lever (no takeoff) for 30 seconds, then reopens and unblocks. Synced to all;
