@@ -408,6 +408,46 @@ namespace ChatChaos.Networking
             }
         }
 
+        /// <summary>
+        /// Teleports every LIVING player back to the ship (from inside the dungeon or
+        /// outside). Each machine teleports its own player (the owner), so the position
+        /// and room state sync naturally.
+        /// </summary>
+        public void TeleportToShip()
+        {
+            if (!IsServer) return;
+            TeleportLocalToShip();
+            Safe(() => TeleportToShipClientRpc());
+        }
+
+        [ClientRpc]
+        private void TeleportToShipClientRpc()
+        {
+            if (IsServer) return;
+            TeleportLocalToShip();
+        }
+
+        private static void TeleportLocalToShip()
+        {
+            var sor = StartOfRound.Instance;
+            if (sor == null) return;
+
+            var p = sor.localPlayerController;
+            if (p == null || !p.isPlayerControlled || p.isPlayerDead) return;
+
+            var spawns = sor.playerSpawnPositions;
+            if (spawns == null || spawns.Length == 0) return;
+
+            int idx = Array.IndexOf(sor.allPlayerScripts, p);
+            int i = Mathf.Clamp(idx < 0 ? 0 : idx, 0, spawns.Length - 1);
+            if (spawns[i] == null) return;
+
+            p.TeleportPlayer(spawns[i].position);
+            p.isInElevator = true;
+            p.isInHangarShipRoom = true;
+            p.isInsideFactory = false;
+        }
+
         private static void HealAllPlayersLocal()
         {
             var sor = StartOfRound.Instance;

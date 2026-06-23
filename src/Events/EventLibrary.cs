@@ -84,6 +84,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("time_frozen", "Time frozen (1m)", "Temps figé (1m)", () =>
                 Core.TimeFreeze.Freeze(60f));
 
+            EventRegistry.Add("teleport_ship", "Teleport to ship", "Téléporter au vaisseau", () =>
+                EventActions.TeleportAllLivingToShip());
+
             EventRegistry.Add("power_outage", "Power outage", "Coupure de courant", () =>
                 Placeholder("power_outage"));
 

@@ -159,5 +159,18 @@ namespace ChatChaos.Events
             else
                 Plugin.Log.LogWarning("ChatChaos: door change skipped (networker not ready).");
         }
+
+        /// <summary>
+        /// Teleports every living player back to the ship (inside the dungeon or outside).
+        /// Networked.
+        /// </summary>
+        public static void TeleportAllLivingToShip()
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+                n.TeleportToShip();
+            else
+                Plugin.Log.LogWarning("ChatChaos: teleport skipped (networker not ready).");
+        }
     }
 }

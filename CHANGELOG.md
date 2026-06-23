@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.23.0
+- New event: "Teleport to ship" / "Téléporter au vaisseau" — teleports every living
+  player back to the ship, whether they are inside the dungeon or outside. Dead players
+  are unaffected. Synced to every player.
+
 ## 0.22.0
 - New event: "Time frozen (1m)" / "Temps figé (1m)" — stops the in-game day clock for 60
   seconds, then resumes it at the moon's normal speed. Synced to every player; the host
