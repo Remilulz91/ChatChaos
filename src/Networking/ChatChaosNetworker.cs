@@ -197,6 +197,50 @@ namespace ChatChaos.Networking
             p.DamagePlayer(damage, true, true, CauseOfDeath.Unknown, 0, false, default);
         }
 
+        private const int MaxHp = 100;   // vanilla max health
+
+        /// <summary>
+        /// Heals every LIVING player to full health. The game has no synced heal, so each
+        /// machine sets every living player's health to max (keeping all copies in sync),
+        /// and refreshes the HUD + clears the injured state for its own player.
+        /// </summary>
+        public void HealAll()
+        {
+            if (!IsServer) return;
+            HealAllPlayersLocal();                     // host machine
+            Safe(() => HealAllClientRpc());            // every other machine
+        }
+
+        [ClientRpc]
+        private void HealAllClientRpc()
+        {
+            if (IsServer) return;   // host already healed on its machine
+            HealAllPlayersLocal();
+        }
+
+        private static void HealAllPlayersLocal()
+        {
+            var sor = StartOfRound.Instance;
+            if (sor == null || sor.allPlayerScripts == null) return;
+
+            var me = sor.localPlayerController;
+            foreach (var p in sor.allPlayerScripts)
+            {
+                if (p == null || !p.isPlayerControlled || p.isPlayerDead) continue;
+
+                p.health = MaxHp;   // keep every copy consistent across machines
+
+                if (p == me)
+                {
+                    // Our own player: refresh the HUD and clear the injured/bleeding state.
+                    p.criticallyInjured = false;
+                    p.bleedingHeavily = false;
+                    if (HUDManager.Instance != null)
+                        HUDManager.Instance.UpdateHealthUI(MaxHp, false);
+                }
+            }
+        }
+
         [ClientRpc]
         private void StartPollClientRpc(string l0, string l1, string l2, float duration)
         {

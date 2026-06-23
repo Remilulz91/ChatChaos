@@ -45,6 +45,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("one_hp", "1 HP", "1 PV", () =>
                 EventActions.SetAllLivingPlayersToOneHp());
 
+            EventRegistry.Add("max_health", "Max health", "Santé max", () =>
+                EventActions.HealAllLivingPlayersToMax());
+
             EventRegistry.Add("recharge_gear", "Recharge equipment", "Recharge équipements", () =>
                 Placeholder("recharge_gear"));
 

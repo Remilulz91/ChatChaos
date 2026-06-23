@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.16.0
+- New event: "Max health" / "Santé max" — heals every living player back to full health
+  (100 HP in vanilla), clearing the injured/bleeding state. Dead players are unaffected.
+  Health is set on every machine so all copies stay in sync.
+
 ## 0.15.0
 - New event: "1 HP" / "1 PV" — sets every living player to 1 HP (dead players are
   unaffected). Networked via the game's damage path so the health bar syncs to everyone.

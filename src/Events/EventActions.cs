@@ -93,5 +93,31 @@ namespace ChatChaos.Events
             if (p != null && p.isPlayerControlled && !p.isPlayerDead && p.health > 1)
                 p.DamagePlayer(p.health - 1, true, true, CauseOfDeath.Unknown, 0, false, default);
         }
+
+        /// <summary>
+        /// Heals every LIVING player to full health (100 HP in vanilla). Dead players are
+        /// not affected. Networked: each machine restores full health for everyone.
+        /// </summary>
+        public static void HealAllLivingPlayersToMax()
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+            {
+                n.HealAll();
+                return;
+            }
+
+            // Fallback (no networker, e.g. very early/solo): heal our own player.
+            var sor = StartOfRound.Instance;
+            var p = sor != null ? sor.localPlayerController : null;
+            if (p != null && p.isPlayerControlled && !p.isPlayerDead)
+            {
+                p.health = 100;
+                p.criticallyInjured = false;
+                p.bleedingHeavily = false;
+                if (HUDManager.Instance != null)
+                    HUDManager.Instance.UpdateHealthUI(100, false);
+            }
+        }
     }
 }
