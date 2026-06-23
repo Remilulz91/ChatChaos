@@ -125,6 +125,10 @@ namespace ChatChaos.Core
             int delay = Mathf.RoundToInt(Mathf.Max(0f, ModConfig.PollDelayAfterLanding.Value));
             string moon = string.IsNullOrWhiteSpace(moonName) ? "?" : moonName.Trim();
 
+            // Clean slate: clear any leftover panel (a frozen/cancelled or result panel
+            // still fading from a previous moon) before scheduling the next poll.
+            UiHide();
+
             _pollsThisMoon = true;
             _nextPollTime = Time.time + delay;
             _phase = Phase.Scheduled;

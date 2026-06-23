@@ -58,18 +58,24 @@ namespace ChatChaos.Core
 
         private static bool ReadLanded(StartOfRound sor)
         {
-            // Try the known flags in order; reflection so a rename only disables the
-            // feature rather than breaking compilation/runtime.
-            foreach (var field in new[] { "shipHasLanded", "shipDoorsEnabled" })
+            // "Landed on a moon" = the ship has landed AND is neither leaving nor back in
+            // orbit. Reading shipIsLeaving makes the poll pause the instant the lever is
+            // pulled, and combining the flags avoids false takeoffs from unrelated state
+            // (e.g. the doors opening/closing). All read defensively via reflection.
+            bool hasLanded = ReadBool(sor, "shipHasLanded");
+            bool isLeaving = ReadBool(sor, "shipIsLeaving");
+            bool inOrbit   = ReadBool(sor, "inShipPhase");
+            return hasLanded && !isLeaving && !inOrbit;
+        }
+
+        private static bool ReadBool(StartOfRound sor, string field)
+        {
+            try
             {
-                try
-                {
-                    var v = Traverse.Create(sor).Field(field).GetValue();
-                    if (v is bool b) return b;
-                }
-                catch { /* try next */ }
+                var v = Traverse.Create(sor).Field(field).GetValue();
+                return v is bool b && b;
             }
-            return false;
+            catch { return false; }
         }
 
         private static string MoonName(StartOfRound sor)

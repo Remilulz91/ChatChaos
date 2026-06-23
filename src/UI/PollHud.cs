@@ -47,6 +47,7 @@ namespace ChatChaos.UI
         private int _rowsUsed;
         private float _endTime;
         private float _autoHideTime = float.MaxValue;
+        private float _votingHardDeadline = float.MaxValue;
         private int _winnerIndex = -1;
         private int _winnerCount;
 
@@ -92,7 +93,8 @@ namespace ChatChaos.UI
             _pausedPulse = false;
             _winnerIndex = -1;
             _endTime = Time.time + duration;
-            _autoHideTime = float.MaxValue;   // the voting panel never auto-hides
+            _autoHideTime = float.MaxValue;   // the voting panel never auto-hides...
+            _votingHardDeadline = Time.time + duration + 12f;   // ...except this safety net
             _active = true;
 
             _title.text = Loc.Get("panel.title");
@@ -140,6 +142,7 @@ namespace ChatChaos.UI
             // Self-contained timer: the result panel clears on its own after the
             // configured duration, even if the host's "hide" network message is lost.
             _autoHideTime = Time.time + Mathf.Max(1f, ModConfig.ResultDisplayDuration.Value);
+            _votingHardDeadline = float.MaxValue;
             _active = true;
 
             // The result view has no countdown: hide the clock and reset the pulse.
@@ -157,6 +160,7 @@ namespace ChatChaos.UI
             _paused = false;
             _pausedPulse = false;
             _autoHideTime = float.MaxValue;
+            _votingHardDeadline = float.MaxValue;
             if (_clockIcon != null) _clockIcon.gameObject.SetActive(false);
             ApplyTimerVisual(1f, HeaderText);
             SetVisible(false);
@@ -188,6 +192,11 @@ namespace ChatChaos.UI
                 int secs = Mathf.Max(0, Mathf.CeilToInt(remaining));
                 _timer.text = secs + "s";
                 UpdateTimerPulse(remaining);
+
+                // Safety net: a voting panel must never stay stuck. If neither a result
+                // nor a hide/pause arrived well past the vote end (e.g. a missed message),
+                // clear it ourselves.
+                if (Time.time >= _votingHardDeadline) Hide();
             }
             else
             {

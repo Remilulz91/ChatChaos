@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.12.0
+- Hardened the poll HUD against takeoff edge cases (voting and winner views):
+  - More reliable takeoff detection (shipHasLanded AND not leaving AND not in orbit),
+    so the poll pauses the instant the lever is pulled and never reacts to unrelated
+    state (e.g. doors opening/closing).
+  - Landing now clears any leftover panel (a frozen/cancelled or fading winner panel
+    from a previous moon) before scheduling the next poll.
+  - Safety net: a voting panel can no longer get stuck on screen — it self-clears if no
+    result/hide ever arrives past the vote end.
+
 ## 0.11.0
 - When a poll is frozen by takeoff during the last 10 seconds, the countdown number now
   keeps pulsing (black<->red + grow/shrink) on a loop while staying frozen, until the
