@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.38.0
+- New event: "Random delivery" / "Livraison aléatoire" — orders a random number (1-8) of
+  random store items for free; the dropship comes and delivers them. Uses the game's own
+  buy RPC, so it's host-authoritative and synced.
+
 ## 0.37.0
 - New event: "Winter sale (1m)" / "Soldes d'hiver (1m)" — forces a random discount
   (30-90% off) on every store item for 60 seconds, then restores the original prices.

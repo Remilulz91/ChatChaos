@@ -204,6 +204,39 @@ namespace ChatChaos.Events
         }
 
         /// <summary>
+        /// Orders a random number of random store items (for free) so the dropship comes
+        /// and delivers them. Uses the game's own buy RPC, so it's host-authoritative and
+        /// synced. Runs on the host.
+        /// </summary>
+        public static void RandomDelivery()
+        {
+            var term = UnityEngine.Object.FindObjectOfType<Terminal>();
+            if (term == null || term.buyableItemsList == null || term.buyableItemsList.Length == 0)
+            {
+                Plugin.Log.LogWarning("[ChatChaos][Delivery] terminal / item list not found.");
+                return;
+            }
+
+            int catalog = term.buyableItemsList.Length;
+            int count = UnityEngine.Random.Range(1, 9);   // 1..8 random items
+            var items = new int[count];
+            for (int i = 0; i < count; i++)
+                items[i] = UnityEngine.Random.Range(0, catalog);
+
+            int numInShip = term.numberOfItemsInDropship + count;
+            try
+            {
+                // Pass the CURRENT credits as the "new" total -> no charge (free delivery).
+                term.BuyItemsServerRpc(items, term.groupCredits, numInShip);
+                Plugin.Log.LogInfo($"[ChatChaos][Delivery] ordered {count} random item(s) for free; dropship incoming.");
+            }
+            catch (System.Exception e)
+            {
+                Plugin.Log.LogError($"[ChatChaos][Delivery] failed: {e}");
+            }
+        }
+
+        /// <summary>
         /// Revives all dead players (teleported back to the ship). Living players are left
         /// where they are. Networked.
         /// </summary>

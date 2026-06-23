@@ -117,6 +117,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("winter_sale", "Winter sale (1m)", "Soldes d'hiver (1m)", () =>
                 Core.WinterSale.Trigger(60f));
 
+            EventRegistry.Add("random_delivery", "Random delivery", "Livraison aléatoire", () =>
+                EventActions.RandomDelivery());
+
             EventRegistry.Add("power_on", "Turn power on", "Allumer courant", () =>
                 EventActions.SetFacilityPower(true));
 
