@@ -51,6 +51,24 @@ namespace ChatChaos.Events
             EventRegistry.Add("double_or_nothing", "Double or nothing", "Quitte ou double", () =>
                 Core.DoubleOrNothing.Arm());
 
+            // Dynamic events: the percentage (5-50) is rolled when the option is drawn, so
+            // the chat sees the exact value, and that same value is applied if it wins.
+            EventRegistry.AddDynamic("scrap_value_down", () =>
+            {
+                int pct = UnityEngine.Random.Range(5, 51);   // 5..50 inclusive
+                return new Core.ChatEvent("scrap_value_down",
+                    $"Scrap value -{pct}%", $"Valeur scrap -{pct}%",
+                    () => EventActions.ChangeScrapValue(-pct));
+            });
+
+            EventRegistry.AddDynamic("scrap_value_up", () =>
+            {
+                int pct = UnityEngine.Random.Range(5, 51);   // 5..50 inclusive
+                return new Core.ChatEvent("scrap_value_up",
+                    $"Scrap value +{pct}%", $"Valeur scrap +{pct}%",
+                    () => EventActions.ChangeScrapValue(pct));
+            });
+
             EventRegistry.Add("recharge_gear", "Recharge equipment", "Recharge équipements", () =>
                 Placeholder("recharge_gear"));
 

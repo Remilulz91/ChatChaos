@@ -240,6 +240,45 @@ namespace ChatChaos.Networking
             terminal.groupCredits = credits;
         }
 
+        /// <summary>
+        /// Changes the value of every scrap item by <paramref name="percent"/> (e.g. -25 or
+        /// +30). Each machine applies the same percentage to its own copies, so values stay
+        /// in sync without sending every item.
+        /// </summary>
+        public void ChangeScrapValues(int percent)
+        {
+            if (!IsServer) return;
+            ApplyScrapValueChangeLocal(percent);
+            Safe(() => ChangeScrapValuesClientRpc(percent));
+        }
+
+        [ClientRpc]
+        private void ChangeScrapValuesClientRpc(int percent)
+        {
+            if (IsServer) return;
+            ApplyScrapValueChangeLocal(percent);
+        }
+
+        private static void ApplyScrapValueChangeLocal(int percent)
+        {
+            float factor = 1f + percent / 100f;
+            var items = UnityEngine.Object.FindObjectsOfType<GrabbableObject>();
+            int changed = 0;
+            foreach (var g in items)
+            {
+                if (g == null || g.itemProperties == null || !g.itemProperties.isScrap) continue;
+
+                int newVal = Mathf.Max(0, Mathf.RoundToInt(g.scrapValue * factor));
+                g.scrapValue = newVal;
+
+                // Refresh the scan display ("Value: $X") if present.
+                var node = g.GetComponentInChildren<ScanNodeProperties>();
+                if (node != null) node.subText = $"Value: ${newVal}";
+                changed++;
+            }
+            Plugin.Log.LogInfo($"ChatChaos: scrap value {(percent >= 0 ? "+" : "")}{percent}% applied to {changed} item(s).");
+        }
+
         private static void HealAllPlayersLocal()
         {
             var sor = StartOfRound.Instance;

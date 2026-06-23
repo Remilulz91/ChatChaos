@@ -119,5 +119,18 @@ namespace ChatChaos.Events
                     HUDManager.Instance.UpdateHealthUI(100, false);
             }
         }
+
+        /// <summary>
+        /// Changes the value of all scrap by <paramref name="percent"/> (negative = worth
+        /// less, positive = worth more). Networked to every player.
+        /// </summary>
+        public static void ChangeScrapValue(int percent)
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+                n.ChangeScrapValues(percent);
+            else
+                Plugin.Log.LogWarning("ChatChaos: scrap value change skipped (networker not ready).");
+        }
     }
 }

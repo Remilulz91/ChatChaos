@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.18.0
+- Event system now supports DYNAMIC events whose label and effect are rolled when the
+  option is drawn (so the chat sees the exact value that will apply).
+- New events: "Scrap value -X%" / "Valeur scrap -X%" and "Scrap value +X%" /
+  "Valeur scrap +X%", where X is rolled 5-50 each time. Changes the value of all scrap
+  by that percentage, synced to every player.
+
 ## 0.17.1
 - Fix build error: 'Object' was ambiguous (System.Object vs UnityEngine.Object) in the
   credit-sync code; fully qualified UnityEngine.Object.
