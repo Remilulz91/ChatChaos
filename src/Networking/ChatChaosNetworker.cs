@@ -235,7 +235,7 @@ namespace ChatChaos.Networking
 
         private static void ApplyGroupCreditsLocal(int credits)
         {
-            var terminal = Object.FindObjectOfType<Terminal>();
+            var terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
             if (terminal == null) return;
             terminal.groupCredits = credits;
         }

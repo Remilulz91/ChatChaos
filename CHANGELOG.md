@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.17.1
+- Fix build error: 'Object' was ambiguous (System.Object vs UnityEngine.Object) in the
+  credit-sync code; fully qualified UnityEngine.Object.
+
 ## 0.17.0
 - New poll option: "Double or nothing" / "Quitte ou double". When it wins, it ARMS a
   gamble that stays pending until the ship next visits the Company:

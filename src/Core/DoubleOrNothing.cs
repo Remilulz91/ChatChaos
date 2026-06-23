@@ -57,7 +57,7 @@ namespace ChatChaos.Core
 
         private static void Resolve()
         {
-            var terminal = Object.FindObjectOfType<Terminal>();
+            var terminal = UnityEngine.Object.FindObjectOfType<Terminal>();
             if (terminal == null)
             {
                 Plugin.Log.LogWarning("DoubleOrNothing: terminal not found — gamble skipped.");
