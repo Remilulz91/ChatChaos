@@ -36,6 +36,7 @@ namespace ChatChaos.Core
             PollManager.Tick();
             PollManager.TickClientNotice();
             TimeFreeze.Tick();
+            StaminaBoost.Tick();
             TrackLanding();
         }
 

@@ -448,6 +448,21 @@ namespace ChatChaos.Networking
             p.isInsideFactory = false;
         }
 
+        /// <summary>Gives every player unlimited stamina for <paramref name="seconds"/>.</summary>
+        public void StartStaminaBoost(float seconds)
+        {
+            if (!IsServer) return;
+            Core.StaminaBoost.Activate(seconds);   // host's own player
+            Safe(() => StaminaBoostClientRpc(seconds));
+        }
+
+        [ClientRpc]
+        private void StaminaBoostClientRpc(float seconds)
+        {
+            if (IsServer) return;
+            Core.StaminaBoost.Activate(seconds);
+        }
+
         private static void HealAllPlayersLocal()
         {
             var sor = StartOfRound.Instance;

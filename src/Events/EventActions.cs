@@ -172,5 +172,15 @@ namespace ChatChaos.Events
             else
                 Plugin.Log.LogWarning("ChatChaos: teleport skipped (networker not ready).");
         }
+
+        /// <summary>Gives every player unlimited stamina for <paramref name="seconds"/>. Networked.</summary>
+        public static void BoostStamina(float seconds)
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+                n.StartStaminaBoost(seconds);
+            else
+                Plugin.Log.LogWarning("ChatChaos: stamina boost skipped (networker not ready).");
+        }
     }
 }

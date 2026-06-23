@@ -87,6 +87,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("teleport_ship", "Teleport to ship", "Téléporter au vaisseau", () =>
                 EventActions.TeleportAllLivingToShip());
 
+            EventRegistry.Add("stamina_boost", "Stamina boost (1m)", "Stamina boostée (1m)", () =>
+                EventActions.BoostStamina(60f));
+
             EventRegistry.Add("power_outage", "Power outage", "Coupure de courant", () =>
                 Placeholder("power_outage"));
 

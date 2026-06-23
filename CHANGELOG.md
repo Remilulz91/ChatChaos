@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.24.0
+- New event: "Stamina boost (1m)" / "Stamina boostée (1m)" — unlimited sprint stamina for
+  every player for 60 seconds (the sprint meter is kept full). Per-player, synced to all.
+
 ## 0.23.0
 - New event: "Teleport to ship" / "Téléporter au vaisseau" — teleports every living
   player back to the ship, whether they are inside the dungeon or outside. Dead players
