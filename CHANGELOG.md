@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.26.0
+- New event: "Ship locked (30s)" / "Vaisseau bloqué (30s)" — closes the hangar door and
+  blocks the lever (no takeoff) for 30 seconds, then reopens and unblocks. Synced to all;
+  the host owns the timer.
+
 ## 0.25.0
 - "Stamina boost (1m)" is now BOOSTED (not unlimited): a flat per-second top-up makes the
   sprint meter drain slower and regenerate faster for 60s, while staying limited.

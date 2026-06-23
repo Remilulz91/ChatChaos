@@ -90,6 +90,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("stamina_boost", "Stamina boost (1m)", "Stamina boostée (1m)", () =>
                 EventActions.BoostStamina(60f));
 
+            EventRegistry.Add("ship_locked", "Ship locked (30s)", "Vaisseau bloqué (30s)", () =>
+                Core.ShipLock.Lock(30f));
+
             EventRegistry.Add("power_outage", "Power outage", "Coupure de courant", () =>
                 Placeholder("power_outage"));
 

@@ -54,6 +54,7 @@ namespace ChatChaos.Core
             DoubleOrNothing.Reset();        // clear any armed gamble at game start
             TimeFreeze.Reset();             // clear any leftover time-freeze timer
             StaminaBoost.Reset();           // clear any leftover stamina boost
+            ShipLock.Reset();               // clear any leftover ship lock
             TwitchClient.StartFromConfig();
         }
 

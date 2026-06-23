@@ -463,6 +463,55 @@ namespace ChatChaos.Networking
             Core.StaminaBoost.Activate(seconds);
         }
 
+        /// <summary>
+        /// Locks (closes the hangar door + blocks the lever) or unlocks the ship on every
+        /// machine. The door/lever interactables are local, so each machine applies it.
+        /// </summary>
+        public void SetShipLocked(bool locked)
+        {
+            if (!IsServer) return;
+            ApplyShipLockedLocal(locked);
+            Safe(() => SetShipLockedClientRpc(locked));
+        }
+
+        [ClientRpc]
+        private void SetShipLockedClientRpc(bool locked)
+        {
+            if (IsServer) return;
+            ApplyShipLockedLocal(locked);
+        }
+
+        private static void ApplyShipLockedLocal(bool locked)
+        {
+            // Lever: block / unblock takeoff.
+            var lever = UnityEngine.Object.FindObjectOfType<StartMatchLever>();
+            if (lever != null && lever.triggerScript != null)
+                lever.triggerScript.interactable = !locked;
+
+            // Hangar door: close (locked) / open (unlocked) + block its buttons.
+            var door = UnityEngine.Object.FindObjectOfType<HangarShipDoor>();
+            if (door != null)
+            {
+                if (door.shipDoorsAnimator != null)
+                    door.shipDoorsAnimator.SetBool("Closed", locked);
+
+                // Best-effort: disable the door buttons so it can't be reopened. The field
+                // name varies between game versions, so we look it up defensively.
+                foreach (var fieldName in new[] { "doorButtons", "buttons", "interactTriggers", "triggers" })
+                {
+                    try
+                    {
+                        var arr = HarmonyLib.Traverse.Create(door).Field(fieldName).GetValue() as InteractTrigger[];
+                        if (arr != null)
+                            foreach (var t in arr) if (t != null) t.interactable = !locked;
+                    }
+                    catch { /* field not present in this version */ }
+                }
+            }
+
+            Plugin.Log.LogInfo($"ChatChaos: ship {(locked ? "locked (door closed, lever blocked)" : "unlocked")}.");
+        }
+
         private static void HealAllPlayersLocal()
         {
             var sor = StartOfRound.Instance;
