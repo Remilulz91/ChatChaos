@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.49.0
+- Poll options now read "1 | Label" (spaces around the separator).
+- Result view: the option list is replaced by a winner-only view (just the winning option
+  in green with the trophy + vote count), instead of the full list with the winner
+  highlighted.
+
 ## 0.48.0
 - Fixed the cursor breaking in the menu/game: the HUD canvases no longer add a
   GraphicRaycaster (they are display-only and were capturing mouse input).

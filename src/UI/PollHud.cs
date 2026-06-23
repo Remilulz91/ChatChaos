@@ -242,37 +242,51 @@ namespace ChatChaos.UI
 
         private void Refresh()
         {
+            if (_finished) { RefreshResult(); return; }
+            RefreshVoting();
+        }
+
+        /// <summary>Voting view: the 3 options with their live bars and counts.</summary>
+        private void RefreshVoting()
+        {
             int max = 1;
             for (int i = 0; i < _rowsUsed; i++) max = Mathf.Max(max, _counts[i]);
 
+            float innerWidth = PanelWidth - Pad * 2;
             for (int i = 0; i < MaxRows; i++)
             {
                 bool used = i < _rowsUsed;
                 _rowBg[i].gameObject.SetActive(used);
                 if (!used) continue;
 
-                bool isWinner = _finished && i == _winnerIndex;
-                bool dimmed = _finished && i != _winnerIndex;
+                float frac = Mathf.Clamp01((float)_counts[i] / max);
+                ((RectTransform)_rowFill[i].transform).sizeDelta = new Vector2(innerWidth * frac, RowHeight);
+                _rowFill[i].color = BarOrange;
+                _rowFill[i].gameObject.SetActive(_counts[i] > 0);
 
-                // Bar width: full for the winner, proportional otherwise.
-                float frac = isWinner ? 1f : Mathf.Clamp01((float)_counts[i] / max);
-                float innerWidth = PanelWidth - Pad * 2;
-                var fillRt = (RectTransform)_rowFill[i].transform;
-                fillRt.sizeDelta = new Vector2(innerWidth * frac, RowHeight);
-
-                // Uniform orange for every voting bar (leader no longer highlighted);
-                // green only for the winner on the result screen.
-                Color fillColor = isWinner ? BarWinner : BarOrange;
-                _rowFill[i].color = fillColor;
-                _rowFill[i].gameObject.SetActive(isWinner || _counts[i] > 0);
-
-                _rowLabel[i].text = $"{i + 1}|{_labels[i]}";
-                _rowLabel[i].color = dimmed ? new Color(1f, 1f, 1f, 0.45f) : RowText;
-
-                string trophy = isWinner ? "  \U0001F3C6" : "";
-                _rowCount[i].text = _counts[i] + trophy;
-                _rowCount[i].color = dimmed ? new Color(1f, 1f, 1f, 0.45f) : RowText;
+                _rowLabel[i].text = $"{i + 1} | {_labels[i]}";
+                _rowLabel[i].color = RowText;
+                _rowCount[i].text = _counts[i].ToString();
+                _rowCount[i].color = RowText;
             }
+        }
+
+        /// <summary>Result view: only the WINNER, shown alone in the first row (green + trophy).</summary>
+        private void RefreshResult()
+        {
+            _rowBg[0].gameObject.SetActive(true);
+            _rowBg[1].gameObject.SetActive(false);
+            _rowBg[2].gameObject.SetActive(false);
+
+            ((RectTransform)_rowFill[0].transform).sizeDelta = new Vector2(PanelWidth - Pad * 2, RowHeight);
+            _rowFill[0].color = BarWinner;
+            _rowFill[0].gameObject.SetActive(true);
+
+            string label = (_winnerIndex >= 0 && _winnerIndex < _rowsUsed) ? _labels[_winnerIndex] : "";
+            _rowLabel[0].text = label;                 // winner only, no number
+            _rowLabel[0].color = RowText;
+            _rowCount[0].text = _winnerCount + "  \U0001F3C6";
+            _rowCount[0].color = RowText;
         }
 
         // ----------------------------------------------------------------- ui build
