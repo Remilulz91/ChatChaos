@@ -52,6 +52,7 @@ namespace ChatChaos.Core
             if (!IsHost) return;
             _connTipShown = false;          // re-show the "connected" tip for this session
             DoubleOrNothing.Reset();        // clear any armed gamble at game start
+            TimeFreeze.Reset();             // clear any leftover time-freeze timer
             TwitchClient.StartFromConfig();
         }
 

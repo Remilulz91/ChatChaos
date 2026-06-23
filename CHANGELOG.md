@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.22.0
+- New event: "Time frozen (1m)" / "Temps figé (1m)" — stops the in-game day clock for 60
+  seconds, then resumes it at the moon's normal speed. Synced to every player; the host
+  owns the timer.
+
 ## 0.21.0
 - "Lock doors": classic doors are now locked with the game's LockDoor() method (per
   machine), so the padlock is shown to every player (instead of only setting the locked

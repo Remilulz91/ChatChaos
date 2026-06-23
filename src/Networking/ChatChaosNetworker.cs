@@ -368,6 +368,46 @@ namespace ChatChaos.Networking
             if (n > 0) Plugin.Log.LogInfo($"ChatChaos: {(unlock ? "unlocked" : "locked")} {n} classic door(s).");
         }
 
+        private static float _savedTimeMultiplier = 1f;
+
+        /// <summary>
+        /// Freezes (frozen=true) or resumes (frozen=false) the in-game day clock on every
+        /// machine, by zeroing / restoring TimeOfDay.globalTimeSpeedMultiplier.
+        /// </summary>
+        public void SetTimeFrozen(bool frozen)
+        {
+            if (!IsServer) return;
+            ApplyTimeFrozenLocal(frozen);
+            Safe(() => SetTimeFrozenClientRpc(frozen));
+        }
+
+        [ClientRpc]
+        private void SetTimeFrozenClientRpc(bool frozen)
+        {
+            if (IsServer) return;
+            ApplyTimeFrozenLocal(frozen);
+        }
+
+        private static void ApplyTimeFrozenLocal(bool frozen)
+        {
+            var tod = TimeOfDay.Instance;
+            if (tod == null) return;
+
+            if (frozen)
+            {
+                // Capture the real running speed (avoid capturing 0 on a double-freeze).
+                if (tod.globalTimeSpeedMultiplier > 0f)
+                    _savedTimeMultiplier = tod.globalTimeSpeedMultiplier;
+                tod.globalTimeSpeedMultiplier = 0f;
+                Plugin.Log.LogInfo("ChatChaos: in-game time frozen.");
+            }
+            else
+            {
+                tod.globalTimeSpeedMultiplier = _savedTimeMultiplier > 0f ? _savedTimeMultiplier : 1f;
+                Plugin.Log.LogInfo("ChatChaos: in-game time resumed.");
+            }
+        }
+
         private static void HealAllPlayersLocal()
         {
             var sor = StartOfRound.Instance;

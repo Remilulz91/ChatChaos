@@ -81,6 +81,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("lock_doors", "Lock doors", "Verrouiller portes", () =>
                 EventActions.SetAllDoors(false));
 
+            EventRegistry.Add("time_frozen", "Time frozen (1m)", "Temps figé (1m)", () =>
+                Core.TimeFreeze.Freeze(60f));
+
             EventRegistry.Add("power_outage", "Power outage", "Coupure de courant", () =>
                 Placeholder("power_outage"));
 
