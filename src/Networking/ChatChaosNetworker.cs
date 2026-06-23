@@ -746,6 +746,33 @@ namespace ChatChaos.Networking
             Core.BerserkShotgun.Clear();
         }
 
+        /// <summary>Detonates every landmine on the map. Each machine detonates locally
+        /// (matching how the game processes a mine explosion per client).</summary>
+        public void ExplodeAllMines()
+        {
+            if (!IsServer) return;
+            DetonateAllMinesLocal();
+            Safe(() => ExplodeAllMinesClientRpc());
+        }
+
+        [ClientRpc]
+        private void ExplodeAllMinesClientRpc()
+        {
+            if (IsServer) return;
+            DetonateAllMinesLocal();
+        }
+
+        private static void DetonateAllMinesLocal()
+        {
+            int n = 0;
+            foreach (var mine in UnityEngine.Object.FindObjectsOfType<Landmine>())
+            {
+                if (mine == null || mine.hasExploded) continue;
+                try { mine.Detonate(); n++; } catch { }
+            }
+            Plugin.Log.LogInfo($"[ChatChaos][Mines] detonated {n} mine(s).");
+        }
+
         private static Item? FindShotgunItem()
         {
             var sor = StartOfRound.Instance;

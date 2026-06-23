@@ -193,6 +193,16 @@ namespace ChatChaos.Events
                 Plugin.Log.LogWarning("ChatChaos: speed boost skipped (networker not ready).");
         }
 
+        /// <summary>Detonates every landmine on the map. Networked.</summary>
+        public static void ExplodeAllMines()
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+                n.ExplodeAllMines();
+            else
+                Plugin.Log.LogWarning("ChatChaos: explode mines skipped (networker not ready).");
+        }
+
         /// <summary>
         /// Revives all dead players (teleported back to the ship). Living players are left
         /// where they are. Networked.

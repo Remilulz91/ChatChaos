@@ -108,6 +108,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("mute_mic", "Mute mic (1m)", "Coupe le micro (1m)", () =>
                 Core.MicMute.Mute(60f));
 
+            EventRegistry.Add("explode_mines", "Detonate all mines", "Exploser toutes les mines", () =>
+                EventActions.ExplodeAllMines());
+
             EventRegistry.Add("power_on", "Turn power on", "Allumer courant", () =>
                 EventActions.SetFacilityPower(true));
 

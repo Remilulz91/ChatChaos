@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.35.0
+- New event: "Detonate all mines" / "Exploser toutes les mines" — instantly detonates
+  every landmine on the map. Each machine detonates locally (as the game does per client).
+
 ## 0.34.0
 - New event: "Mute mic (1m)" / "Coupe le micro (1m)" — mutes the host's in-game voice
   (Dissonance) for 60 seconds, then unmutes. Host-local (no networking); done via
