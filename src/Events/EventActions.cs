@@ -195,5 +195,15 @@ namespace ChatChaos.Events
             else
                 StartOfRound.Instance?.ReviveDeadPlayers();
         }
+
+        /// <summary>Turns the facility (dungeon) power on (true) or off (false). Networked.</summary>
+        public static void SetFacilityPower(bool on)
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+                n.SetFacilityPower(on);
+            else
+                Plugin.Log.LogWarning("ChatChaos: power change skipped (networker not ready).");
+        }
     }
 }

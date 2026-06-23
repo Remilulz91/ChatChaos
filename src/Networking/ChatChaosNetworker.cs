@@ -539,6 +539,56 @@ namespace ChatChaos.Networking
             Plugin.Log.LogInfo("ChatChaos: revived dead players (teleported to the ship).");
         }
 
+        /// <summary>
+        /// Turns the facility power on/off on every machine. The exact method name varies
+        /// between game versions, so we call it by reflection trying several candidates;
+        /// this guarantees the build never breaks on a wrong name.
+        /// </summary>
+        public void SetFacilityPower(bool on)
+        {
+            if (!IsServer) return;
+            ApplyPowerLocal(on);
+            Safe(() => SetFacilityPowerClientRpc(on));
+        }
+
+        [ClientRpc]
+        private void SetFacilityPowerClientRpc(bool on)
+        {
+            if (IsServer) return;
+            ApplyPowerLocal(on);
+        }
+
+        private static void ApplyPowerLocal(bool on)
+        {
+            var box = UnityEngine.Object.FindObjectOfType<BreakerBox>();
+            var rm = RoundManager.Instance;
+
+            bool done =
+                TryInvoke(box, "SwitchBreaker", on) ||
+                TryInvoke(rm, "SwitchPower", on) ||
+                TryInvoke(rm, on ? "PowerSwitchOn" : "PowerSwitchOff") ||
+                TryInvoke(rm, on ? "TurnOnAllLights" : "TurnOffAllLights");
+
+            Plugin.Log.LogInfo($"ChatChaos: facility power {(on ? "on" : "off")} -> " +
+                               (done ? "applied" : "NO matching method found (tell the dev)."));
+        }
+
+        private static bool TryInvoke(object target, string method, params object[] args)
+        {
+            if (target == null) return false;
+            try
+            {
+                var m = HarmonyLib.Traverse.Create(target).Method(method, args);
+                if (m.MethodExists())
+                {
+                    m.GetValue();
+                    return true;
+                }
+            }
+            catch { /* try the next candidate */ }
+            return false;
+        }
+
         private static void HealAllPlayersLocal()
         {
             var sor = StartOfRound.Instance;

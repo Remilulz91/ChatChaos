@@ -96,8 +96,11 @@ namespace ChatChaos.Events
             EventRegistry.Add("revive_team", "Team revive", "Résurrection équipe", () =>
                 EventActions.ReviveDeadTeam());
 
-            EventRegistry.Add("power_outage", "Power outage", "Coupure de courant", () =>
-                Placeholder("power_outage"));
+            EventRegistry.Add("power_on", "Turn power on", "Allumer courant", () =>
+                EventActions.SetFacilityPower(true));
+
+            EventRegistry.Add("power_off", "Turn power off", "Eteindre courant", () =>
+                EventActions.SetFacilityPower(false));
 
             EventRegistry.Add("random_teleport", "Random teleport", "Téléportation aléatoire", () =>
                 Placeholder("random_teleport"));

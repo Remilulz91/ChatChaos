@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.28.0
+- New events: "Turn power on" / "Allumer courant" and "Turn power off" / "Eteindre
+  courant" — control the facility (dungeon) power. The breaker method is called by
+  reflection (several candidate names) so the build can't break on a version difference;
+  the log shows which one applied. Synced to all.
+
 ## 0.27.0
 - New event: "Team revive" / "Résurrection équipe" — revives all dead players and
   teleports them back to the ship (via the game's ReviveDeadPlayers). Living players are
