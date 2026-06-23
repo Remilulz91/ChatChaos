@@ -135,19 +135,7 @@ namespace ChatChaos.Events
             EventRegistry.Add("power_off", "Turn power off", "Eteindre courant", () =>
                 EventActions.SetFacilityPower(false));
 
-            EventRegistry.Add("random_teleport", "Random teleport", "Téléportation aléatoire", () =>
-                Placeholder("random_teleport"));
-
             // Add as many as you like below — copy the template from the comment above.
-        }
-
-        /// <summary>
-        /// Temporary effect for a not-yet-implemented event: it just logs so you can
-        /// see the full flow working. Delete these calls as you implement each event.
-        /// </summary>
-        private static void Placeholder(string id)
-        {
-            Plugin.Log.LogInfo($"[Event] '{id}' won the vote — placeholder effect (no game change yet).");
         }
     }
 }

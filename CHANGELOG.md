@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.42.0
+- Removed the leftover "random_teleport" placeholder event (it was an early example, not a
+  real event) and the now-unused Placeholder helper.
+
 ## 0.41.0
 - New event: "Start of day" / "Début de journée" — resets the in-game day clock back to
   the morning landing time (currentDayTime = 0), which also pushes back the end-of-day
