@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.50.0
+- The poll panel now uses the game's own font (TextMeshPro) instead of a generic smooth
+  font, for the authentic terminal/pixel look. Font is grabbed from the game HUD at
+  runtime (falls back to the default TMP font).
+
 ## 0.49.0
 - Poll options now read "1 | Label" (spaces around the separator).
 - Result view: the option list is replaced by a winner-only view (just the winning option

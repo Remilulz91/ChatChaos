@@ -1,5 +1,6 @@
 using ChatChaos.Config;
 using ChatChaos.Localization;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -54,16 +55,18 @@ namespace ChatChaos.UI
         // ---- ui refs ----
         private Canvas _canvas = null!;
         private RectTransform _panel = null!;
-        private Text _title = null!;
-        private Text _timer = null!;
+        private TextMeshProUGUI _title = null!;
+        private TextMeshProUGUI _timer = null!;
         private Image _clockIcon = null!;
-        private Text _instruction = null!;
+        private TextMeshProUGUI _instruction = null!;
         private Sprite _white = null!;
+        private TMP_FontAsset? _gameFont;
+        private bool _fontApplied;
 
         private readonly Image[] _rowBg = new Image[MaxRows];
         private readonly Image[] _rowFill = new Image[MaxRows];
-        private readonly Text[] _rowLabel = new Text[MaxRows];
-        private readonly Text[] _rowCount = new Text[MaxRows];
+        private readonly TextMeshProUGUI[] _rowLabel = new TextMeshProUGUI[MaxRows];
+        private readonly TextMeshProUGUI[] _rowCount = new TextMeshProUGUI[MaxRows];
 
         public static void EnsureExists()
         {
@@ -97,6 +100,7 @@ namespace ChatChaos.UI
             _votingHardDeadline = Time.time + duration + 12f;   // ...except this safety net
             _active = true;
 
+            EnsureGameFont();
             _title.text = Loc.Get("panel.title");
             _instruction.text = Loc.Get("panel.instruction");
             _instruction.color = HeaderText;
@@ -132,6 +136,7 @@ namespace ChatChaos.UI
 
         public void ShowResult(int winnerIndex, int winnerCount)
         {
+            EnsureGameFont();
             _finished = true;
             _paused = false;
             _pausedPulse = false;
@@ -319,7 +324,7 @@ namespace ChatChaos.UI
             _panel.localScale = new Vector3(scale, scale, 1f);
 
             // Title (top-left).
-            _title = NewText(_panel, "Title", ">SONDAGE", 30, TextAnchor.UpperLeft, HeaderText, FontStyle.Bold);
+            _title = NewText(_panel, "Title", ">SONDAGE", 30, TextAlignmentOptions.TopLeft, HeaderText, FontStyles.Bold);
             Place(_title.rectTransform, Pad, Pad, PanelWidth - Pad * 2, 36);
 
             // Timer (top-right): a drawn clock icon + the seconds number. Both pulse
@@ -332,7 +337,7 @@ namespace ChatChaos.UI
             iconRt.sizeDelta = new Vector2(26, 26);
             iconRt.anchoredPosition = new Vector2(-(Pad + 60), -(Pad + 18));
 
-            _timer = NewText(_panel, "Timer", "", 26, TextAnchor.MiddleRight, HeaderText, FontStyle.Bold);
+            _timer = NewText(_panel, "Timer", "", 26, TextAlignmentOptions.MidlineRight, HeaderText, FontStyles.Bold);
             var trt = _timer.rectTransform;
             trt.anchorMin = trt.anchorMax = new Vector2(1, 1);
             trt.pivot = new Vector2(1, 0.5f);
@@ -340,7 +345,7 @@ namespace ChatChaos.UI
             trt.anchoredPosition = new Vector2(-Pad, -(Pad + 18));
 
             // Instruction line.
-            _instruction = NewText(_panel, "Instruction", "", 18, TextAnchor.UpperLeft, HeaderText, FontStyle.Normal);
+            _instruction = NewText(_panel, "Instruction", "", 18, TextAlignmentOptions.TopLeft, HeaderText, FontStyles.Normal);
             Place(_instruction.rectTransform, Pad, Pad + 42, PanelWidth - Pad * 2, 26);
 
             // Rows.
@@ -360,12 +365,12 @@ namespace ChatChaos.UI
                 frt.anchoredPosition = Vector2.zero;
                 frt.sizeDelta = new Vector2(0, RowHeight);
 
-                var label = NewText(bg.transform, "RowLabel" + i, "", 18, TextAnchor.MiddleLeft, RowText, FontStyle.Bold);
+                var label = NewText(bg.transform, "RowLabel" + i, "", 18, TextAlignmentOptions.MidlineLeft, RowText, FontStyles.Bold);
                 Place(label.rectTransform, 10, 0, PanelWidth - Pad * 2 - 70, RowHeight);
                 label.rectTransform.anchoredPosition = new Vector2(10, 0);
                 StretchVert(label.rectTransform);
 
-                var count = NewText(bg.transform, "RowCount" + i, "", 18, TextAnchor.MiddleRight, RowText, FontStyle.Bold);
+                var count = NewText(bg.transform, "RowCount" + i, "", 18, TextAlignmentOptions.MidlineRight, RowText, FontStyles.Bold);
                 var crt = count.rectTransform;
                 crt.anchorMin = new Vector2(1, 0); crt.anchorMax = new Vector2(1, 1); crt.pivot = new Vector2(1, 0.5f);
                 crt.sizeDelta = new Vector2(90, 0);
@@ -393,21 +398,54 @@ namespace ChatChaos.UI
             return img;
         }
 
-        private Text NewText(Transform parent, string name, string text, int size,
-                             TextAnchor anchor, Color color, FontStyle style)
+        private TextMeshProUGUI NewText(Transform parent, string name, string text, int size,
+                                        TextAlignmentOptions align, Color color, FontStyles style)
         {
-            var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+            var go = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
             go.transform.SetParent(parent, false);
-            var t = go.GetComponent<Text>();
+            var t = go.GetComponent<TextMeshProUGUI>();
             t.text = text;
-            t.font = GetFont();
+            if (_gameFont != null) t.font = _gameFont;   // else applied lazily by EnsureGameFont()
             t.fontSize = size;
             t.fontStyle = style;
-            t.alignment = anchor;
+            t.alignment = align;
             t.color = color;
-            t.horizontalOverflow = HorizontalWrapMode.Overflow;
-            t.verticalOverflow = VerticalWrapMode.Overflow;
+            t.enableWordWrapping = false;
+            t.overflowMode = TextOverflowModes.Overflow;
+            t.raycastTarget = false;
             return t;
+        }
+
+        /// <summary>Applies the game's TMP font to all texts (lazily, once it's available).</summary>
+        private void EnsureGameFont()
+        {
+            if (_fontApplied) return;
+            var f = FindGameFont();
+            if (f == null) return;
+
+            _gameFont = f;
+            _title.font = f; _timer.font = f; _instruction.font = f;
+            for (int i = 0; i < MaxRows; i++) { _rowLabel[i].font = f; _rowCount[i].font = f; }
+            _fontApplied = true;
+        }
+
+        private static TMP_FontAsset? FindGameFont()
+        {
+            // Prefer a font the game HUD actually uses (control tips), read by reflection
+            // so we don't compile-depend on the exact field name.
+            try
+            {
+                var hud = HUDManager.Instance;
+                if (hud != null)
+                {
+                    var tips = HarmonyLib.Traverse.Create(hud).Field("controlTipLines").GetValue() as TextMeshProUGUI[];
+                    if (tips != null)
+                        foreach (var t in tips)
+                            if (t != null && t.font != null) return t.font;
+                }
+            }
+            catch { }
+            try { return TMP_Settings.defaultFontAsset; } catch { return null; }
         }
 
         /// <summary>Anchors a rect to the panel's TOP-LEFT and positions it (x right, y down).</summary>
@@ -427,14 +465,6 @@ namespace ChatChaos.UI
             rt.pivot = new Vector2(0, 0.5f);
         }
 
-        private static Font GetFont()
-        {
-            Font? f = null;
-            try { f = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); } catch { }
-            if (f == null) { try { f = Resources.GetBuiltinResource<Font>("Arial.ttf"); } catch { } }
-            if (f == null) f = Font.CreateDynamicFontFromOSFont("Consolas", 16);
-            return f!;
-        }
 
         private static Sprite MakeWhiteSprite()
         {
