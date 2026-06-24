@@ -68,7 +68,7 @@ namespace ChatChaos.Core
             TwitchClient.StartFromConfig();
         }
 
-        /// <summary>True if at least one chat source (Twitch; YouTube later) is connected.</summary>
+        /// <summary>True if a chat source (Twitch) is connected.</summary>
         private static bool IsAccountConnected()
         {
             var tw = TwitchClient.Instance;

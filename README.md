@@ -31,8 +31,6 @@ Author: **Remilulz_91** — © 2026 Remilulz_91, all rights reserved.
 - **Multi-language.** The panel and chat messages are in **French** when the game is
   in French, **English** otherwise (override in the config).
 
-> YouTube support is planned for a later version. For now the integration is Twitch.
-
 ---
 
 ## Quick setup (host / streamer)

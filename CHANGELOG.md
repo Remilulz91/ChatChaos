@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.54.0
+- Dropped the planned YouTube integration; the mod stays focused on Twitch. Removed the
+  related notes from the README and code comments (no functional change).
+
 ## 0.53.0
 - All three HUDs now use the game's own 3270 font (the IBM-3270 pixel font Lethal Company
   uses everywhere). The Berserk overlay and the effect-timer list were still on Arial; they
