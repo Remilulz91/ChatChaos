@@ -59,6 +59,7 @@ namespace ChatChaos.UI
         private TextMeshProUGUI _title = null!;
         private TextMeshProUGUI _timer = null!;
         private Image _clockIcon = null!;
+        private Image _trophyIcon = null!;
         private TextMeshProUGUI _instruction = null!;
         private Sprite _white = null!;
         private TMP_FontAsset? _gameFont;
@@ -285,6 +286,10 @@ namespace ChatChaos.UI
                 _rowCount[i].text = _counts[i].ToString();
                 _rowCount[i].color = RowText;
             }
+
+            // No trophy during voting; keep the count flush right.
+            _trophyIcon.gameObject.SetActive(false);
+            _rowCount[0].rectTransform.anchoredPosition = new Vector2(-10, 0);
         }
 
         /// <summary>Result view: only the WINNER, shown alone in the first row (green + trophy).</summary>
@@ -301,9 +306,13 @@ namespace ChatChaos.UI
             string label = (_winnerIndex >= 0 && _winnerIndex < _rowsUsed) ? _labels[_winnerIndex] : "";
             _rowLabel[0].text = label;                 // winner only, no number
             _rowLabel[0].color = HeaderText;           // dark text reads better on the green bar
-            // No trophy emoji: the game's pixel font has no glyph for it (renders as a square).
             _rowCount[0].text = _winnerCount.ToString();
             _rowCount[0].color = HeaderText;
+
+            // Drawn trophy at the far right of the row; shift the count left to make room.
+            _trophyIcon.color = HeaderText;
+            _trophyIcon.gameObject.SetActive(true);
+            _rowCount[0].rectTransform.anchoredPosition = new Vector2(-38, 0);
         }
 
         // ----------------------------------------------------------------- ui build
@@ -390,6 +399,18 @@ namespace ChatChaos.UI
                 _rowLabel[i] = label;
                 _rowCount[i] = count;
             }
+
+            // Trophy icon for the winner row (drawn sprite; the game's pixel font has no
+            // glyph for the 🏆 emoji). Lives at the far right of the winner row, hidden
+            // until the result view is shown.
+            _trophyIcon = NewImage(_rowBg[0].transform, "TrophyIcon", HeaderText);
+            _trophyIcon.sprite = MakeTrophySprite();
+            var thr = (RectTransform)_trophyIcon.transform;
+            thr.anchorMin = thr.anchorMax = new Vector2(1, 0.5f);
+            thr.pivot = new Vector2(1, 0.5f);
+            thr.sizeDelta = new Vector2(24, 24);
+            thr.anchoredPosition = new Vector2(-8, 0);
+            _trophyIcon.gameObject.SetActive(false);
         }
 
         private void SetVisible(bool v)
@@ -536,6 +557,62 @@ namespace ChatChaos.UI
             Line(cx, cy, cx, cy + R * 0.55f, 2.2f);
             Line(cx, cy, cx + R * 0.62f, cy + R * 0.20f, 2.2f);
             Line(cx, cy, cx, cy, 3f);
+
+            tex.SetPixels32(px);
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, S, S), new Vector2(0.5f, 0.5f), 100f);
+        }
+
+        /// <summary>
+        /// Draws a trophy cup (bowl + side handles + stem + base) into a texture at runtime.
+        /// White on transparent, tinted via Image.color. y is up (0 = bottom of the texture).
+        /// </summary>
+        private static Sprite MakeTrophySprite()
+        {
+            const int S = 64;
+            var tex = new Texture2D(S, S, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+            var px = new Color32[S * S];
+            for (int i = 0; i < px.Length; i++) px[i] = new Color32(255, 255, 255, 0);
+
+            var on = new Color32(255, 255, 255, 255);
+            float cx = 31.5f;
+
+            void Set(int x, int y) { if (x >= 0 && x < S && y >= 0 && y < S) px[y * S + x] = on; }
+            void FillRect(int x0, int x1, int y0, int y1)
+            {
+                for (int y = y0; y <= y1; y++) for (int x = x0; x <= x1; x++) Set(x, y);
+            }
+
+            // Cup bowl: solid, tapering from a wide rim (top) down to a rounded bottom.
+            const int bowlBottom = 30, bowlTop = 53;
+            for (int y = bowlBottom; y <= bowlTop; y++)
+            {
+                float t = (float)(y - bowlBottom) / (bowlTop - bowlBottom);   // 0 bottom .. 1 rim
+                float halfW = Mathf.Lerp(7f, 16f, t);
+                FillRect(Mathf.RoundToInt(cx - halfW), Mathf.RoundToInt(cx + halfW), y, y);
+            }
+            // Rim lip: a slightly wider bar across the very top.
+            FillRect(Mathf.RoundToInt(cx - 17), Mathf.RoundToInt(cx + 17), 53, 56);
+
+            // Handles: a ring on each side of the bowl, keeping only the outer half.
+            void Handle(float hcx, bool left)
+            {
+                const float r = 8.5f, thick = 3f;
+                for (int y = 38; y <= 54; y++)
+                    for (int x = 0; x < S; x++)
+                    {
+                        float dx = x - hcx, dy = y - 47f, d = Mathf.Sqrt(dx * dx + dy * dy);
+                        if (d > r || d < r - thick) continue;
+                        if (left ? x <= hcx : x >= hcx) Set(x, y);
+                    }
+            }
+            Handle(cx - 15f, true);
+            Handle(cx + 15f, false);
+
+            // Stem under the bowl, a knob, then a wide base plate.
+            FillRect(Mathf.RoundToInt(cx - 2.5f), Mathf.RoundToInt(cx + 2.5f), 21, 31);
+            FillRect(Mathf.RoundToInt(cx - 5f), Mathf.RoundToInt(cx + 5f), 17, 21);
+            FillRect(Mathf.RoundToInt(cx - 12f), Mathf.RoundToInt(cx + 12f), 9, 15);
 
             tex.SetPixels32(px);
             tex.Apply();

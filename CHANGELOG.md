@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.52.0
+- Winner panel now shows a drawn trophy sprite (cup with handles, stem and base) at the
+  right of the winning row, instead of the unsupported emoji. Drawn at runtime like the
+  clock icon, tinted dark to match the winner text. The vote count shifts left to make room.
+
 ## 0.51.0
 - Winner panel is now compact: when only the winner is shown, the panel shrinks to a
   small header + single row (instead of keeping the full 3-option height), matching the
