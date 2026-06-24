@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +8,8 @@ namespace ChatChaos.UI
     /// Full-screen "RECEIVING SIGNAL" -> "GO BERSERK" overlay played when the Berserk
     /// event wins, typed letter by letter. Purely visual; it self-hides after the
     /// animation. The actual berserk effect is started by the host once this finishes.
+    ///
+    /// Uses the game's own 3270 font (grabbed at runtime).
     /// </summary>
     public class BerserkHud : MonoBehaviour
     {
@@ -23,9 +26,11 @@ namespace ChatChaos.UI
         private const float TotalDur = 3.4f;         // total overlay time
 
         private RectTransform _panel = null!;
-        private Text _signal = null!;
-        private Text _berserk = null!;
+        private TextMeshProUGUI _signal = null!;
+        private TextMeshProUGUI _berserk = null!;
         private Sprite _white = null!;
+        private TMP_FontAsset? _gameFont;
+        private bool _fontApplied;
         private bool _active;
         private float _start;
 
@@ -46,6 +51,7 @@ namespace ChatChaos.UI
 
         public void ShowSignal()
         {
+            EnsureGameFont();
             _active = true;
             _start = Time.time;
             _signal.text = "";
@@ -56,6 +62,7 @@ namespace ChatChaos.UI
         private void Update()
         {
             if (!_active) return;
+            EnsureGameFont();
             float t = Time.time - _start;
 
             int sc = Mathf.Clamp(Mathf.FloorToInt(SignalLine.Length * (t / SignalTypeDur)), 0, SignalLine.Length);
@@ -95,15 +102,26 @@ namespace ChatChaos.UI
             var bg = NewImage(_panel, "BG", new Color(0f, 0f, 0f, 0.45f));
             Stretch((RectTransform)bg.transform);
 
-            _signal = NewText(_panel, "Signal", 54, SignalColor, FontStyle.Bold);
+            _signal = NewText(_panel, "Signal", 54, SignalColor);
             var srt = _signal.rectTransform;
             srt.anchorMin = new Vector2(0, 0.60f); srt.anchorMax = new Vector2(1, 0.72f);
             srt.offsetMin = Vector2.zero; srt.offsetMax = Vector2.zero;
 
-            _berserk = NewText(_panel, "Berserk", 96, BerserkColor, FontStyle.Bold);
+            _berserk = NewText(_panel, "Berserk", 96, BerserkColor);
             var brt = _berserk.rectTransform;
             brt.anchorMin = new Vector2(0, 0.38f); brt.anchorMax = new Vector2(1, 0.58f);
             brt.offsetMin = Vector2.zero; brt.offsetMax = Vector2.zero;
+        }
+
+        private void EnsureGameFont()
+        {
+            if (_fontApplied) return;
+            var f = GameFont.Find();
+            if (f == null) return;
+            _gameFont = f;
+            _signal.font = f;
+            _berserk.font = f;
+            _fontApplied = true;
         }
 
         private void SetVisible(bool v) { if (_panel != null) _panel.gameObject.SetActive(v); }
@@ -124,28 +142,20 @@ namespace ChatChaos.UI
             return img;
         }
 
-        private Text NewText(Transform parent, string name, int size, Color color, FontStyle style)
+        private TextMeshProUGUI NewText(Transform parent, string name, int size, Color color)
         {
-            var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+            var go = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
             go.transform.SetParent(parent, false);
-            var t = go.GetComponent<Text>();
-            t.font = GetFont();
+            var t = go.GetComponent<TextMeshProUGUI>();
+            if (_gameFont != null) t.font = _gameFont;
             t.fontSize = size;
-            t.fontStyle = style;
-            t.alignment = TextAnchor.MiddleCenter;
+            t.fontStyle = FontStyles.Bold;
+            t.alignment = TextAlignmentOptions.Center;
             t.color = color;
-            t.horizontalOverflow = HorizontalWrapMode.Overflow;
-            t.verticalOverflow = VerticalWrapMode.Overflow;
+            t.enableWordWrapping = false;
+            t.overflowMode = TextOverflowModes.Overflow;
+            t.raycastTarget = false;
             return t;
-        }
-
-        private static Font GetFont()
-        {
-            Font? f = null;
-            try { f = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); } catch { }
-            if (f == null) { try { f = Resources.GetBuiltinResource<Font>("Arial.ttf"); } catch { } }
-            if (f == null) f = Font.CreateDynamicFontFromOSFont("Consolas", 16);
-            return f!;
         }
 
         private static Sprite MakeWhiteSprite()

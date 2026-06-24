@@ -30,14 +30,21 @@ namespace ChatChaos.UI
         private static readonly Color BarWinner     = new Color32(95, 190, 70, 255);
         private static readonly Color RowText        = new Color32(238, 238, 238, 255);
         private static readonly Color AlarmRed       = new Color32(214, 48, 40, 255);
+        private static readonly Color Gold           = new Color32(242, 196, 72, 255);   // winner trophy
 
-        private const int PanelWidth = 470;
-        private const int PanelHeight = 232;
-        private const int ResultHeight = 145;   // compact panel when only the winner is shown
-        private const int Pad = 16;
-        private const int RowHeight = 34;
-        private const int RowGap = 9;
+        private const int PanelWidth = 560;
+        private const int PanelHeight = 272;
+        private const int ResultHeight = 166;   // compact panel when only the winner is shown
+        private const int Pad = 18;
+        private const int RowHeight = 42;
+        private const int RowGap = 11;
         private const int MaxRows = 3;
+
+        // Vertical layout (derived once so the panel and rows stay in sync).
+        private const int TitleH = 42;
+        private const int InstrY = Pad + TitleH + 6;        // instruction line top
+        private const int InstrH = 30;
+        private const int RowsTop = InstrY + InstrH + 10;   // first row top
 
         // ---- state ----
         private bool _active;
@@ -289,7 +296,7 @@ namespace ChatChaos.UI
 
             // No trophy during voting; keep the count flush right.
             _trophyIcon.gameObject.SetActive(false);
-            _rowCount[0].rectTransform.anchoredPosition = new Vector2(-10, 0);
+            _rowCount[0].rectTransform.anchoredPosition = new Vector2(-12, 0);
         }
 
         /// <summary>Result view: only the WINNER, shown alone in the first row (green + trophy).</summary>
@@ -309,10 +316,10 @@ namespace ChatChaos.UI
             _rowCount[0].text = _winnerCount.ToString();
             _rowCount[0].color = HeaderText;
 
-            // Drawn trophy at the far right of the row; shift the count left to make room.
-            _trophyIcon.color = HeaderText;
+            // Drawn gold trophy at the far right of the row; shift the count left for room.
+            _trophyIcon.color = Gold;
             _trophyIcon.gameObject.SetActive(true);
-            _rowCount[0].rectTransform.anchoredPosition = new Vector2(-38, 0);
+            _rowCount[0].rectTransform.anchoredPosition = new Vector2(-50, 0);
         }
 
         // ----------------------------------------------------------------- ui build
@@ -345,32 +352,33 @@ namespace ChatChaos.UI
             _panel.localScale = new Vector3(scale, scale, 1f);
 
             // Title (top-left).
-            _title = NewText(_panel, "Title", ">SONDAGE", 30, TextAlignmentOptions.TopLeft, HeaderText, FontStyles.Bold);
-            Place(_title.rectTransform, Pad, Pad, PanelWidth - Pad * 2, 36);
+            _title = NewText(_panel, "Title", ">SONDAGE", 38, TextAlignmentOptions.TopLeft, HeaderText, FontStyles.Bold);
+            Place(_title.rectTransform, Pad, Pad, PanelWidth - Pad * 2, TitleH);
 
             // Timer (top-right): a drawn clock icon + the seconds number. Both pulse
             // (scale + colour) during the last 10 seconds.
+            int titleMid = Pad + TitleH / 2;
             _clockIcon = NewImage(_panel, "ClockIcon", HeaderText);
             _clockIcon.sprite = MakeClockSprite();
             var iconRt = (RectTransform)_clockIcon.transform;
             iconRt.anchorMin = iconRt.anchorMax = new Vector2(1, 1);
             iconRt.pivot = new Vector2(1, 0.5f);
-            iconRt.sizeDelta = new Vector2(26, 26);
-            iconRt.anchoredPosition = new Vector2(-(Pad + 60), -(Pad + 18));
+            iconRt.sizeDelta = new Vector2(32, 32);
+            iconRt.anchoredPosition = new Vector2(-(Pad + 78), -titleMid);
 
-            _timer = NewText(_panel, "Timer", "", 26, TextAlignmentOptions.MidlineRight, HeaderText, FontStyles.Bold);
+            _timer = NewText(_panel, "Timer", "", 32, TextAlignmentOptions.MidlineRight, HeaderText, FontStyles.Bold);
             var trt = _timer.rectTransform;
             trt.anchorMin = trt.anchorMax = new Vector2(1, 1);
             trt.pivot = new Vector2(1, 0.5f);
-            trt.sizeDelta = new Vector2(58, 34);
-            trt.anchoredPosition = new Vector2(-Pad, -(Pad + 18));
+            trt.sizeDelta = new Vector2(72, TitleH);
+            trt.anchoredPosition = new Vector2(-Pad, -titleMid);
 
             // Instruction line.
-            _instruction = NewText(_panel, "Instruction", "", 18, TextAlignmentOptions.TopLeft, HeaderText, FontStyles.Normal);
-            Place(_instruction.rectTransform, Pad, Pad + 42, PanelWidth - Pad * 2, 26);
+            _instruction = NewText(_panel, "Instruction", "", 22, TextAlignmentOptions.TopLeft, HeaderText, FontStyles.Normal);
+            Place(_instruction.rectTransform, Pad, InstrY, PanelWidth - Pad * 2, InstrH);
 
             // Rows.
-            int top = Pad + 76;
+            int top = RowsTop;
             for (int i = 0; i < MaxRows; i++)
             {
                 int y = top + i * (RowHeight + RowGap);
@@ -386,16 +394,16 @@ namespace ChatChaos.UI
                 frt.anchoredPosition = Vector2.zero;
                 frt.sizeDelta = new Vector2(0, RowHeight);
 
-                var label = NewText(bg.transform, "RowLabel" + i, "", 18, TextAlignmentOptions.MidlineLeft, RowText, FontStyles.Bold);
-                Place(label.rectTransform, 10, 0, PanelWidth - Pad * 2 - 70, RowHeight);
-                label.rectTransform.anchoredPosition = new Vector2(10, 0);
+                var label = NewText(bg.transform, "RowLabel" + i, "", 24, TextAlignmentOptions.MidlineLeft, RowText, FontStyles.Bold);
+                Place(label.rectTransform, 12, 0, PanelWidth - Pad * 2 - 80, RowHeight);
+                label.rectTransform.anchoredPosition = new Vector2(12, 0);
                 StretchVert(label.rectTransform);
 
-                var count = NewText(bg.transform, "RowCount" + i, "", 18, TextAlignmentOptions.MidlineRight, RowText, FontStyles.Bold);
+                var count = NewText(bg.transform, "RowCount" + i, "", 24, TextAlignmentOptions.MidlineRight, RowText, FontStyles.Bold);
                 var crt = count.rectTransform;
                 crt.anchorMin = new Vector2(1, 0); crt.anchorMax = new Vector2(1, 1); crt.pivot = new Vector2(1, 0.5f);
-                crt.sizeDelta = new Vector2(90, 0);
-                crt.anchoredPosition = new Vector2(-10, 0);
+                crt.sizeDelta = new Vector2(100, 0);
+                crt.anchoredPosition = new Vector2(-12, 0);
                 _rowLabel[i] = label;
                 _rowCount[i] = count;
             }
@@ -408,8 +416,8 @@ namespace ChatChaos.UI
             var thr = (RectTransform)_trophyIcon.transform;
             thr.anchorMin = thr.anchorMax = new Vector2(1, 0.5f);
             thr.pivot = new Vector2(1, 0.5f);
-            thr.sizeDelta = new Vector2(24, 24);
-            thr.anchoredPosition = new Vector2(-8, 0);
+            thr.sizeDelta = new Vector2(32, 32);
+            thr.anchoredPosition = new Vector2(-10, 0);
             _trophyIcon.gameObject.SetActive(false);
         }
 
@@ -462,24 +470,7 @@ namespace ChatChaos.UI
             _fontApplied = true;
         }
 
-        private static TMP_FontAsset? FindGameFont()
-        {
-            // Prefer a font the game HUD actually uses (control tips), read by reflection
-            // so we don't compile-depend on the exact field name.
-            try
-            {
-                var hud = HUDManager.Instance;
-                if (hud != null)
-                {
-                    var tips = HarmonyLib.Traverse.Create(hud).Field("controlTipLines").GetValue() as TextMeshProUGUI[];
-                    if (tips != null)
-                        foreach (var t in tips)
-                            if (t != null && t.font != null) return t.font;
-                }
-            }
-            catch { }
-            try { return TMP_Settings.defaultFontAsset; } catch { return null; }
-        }
+        private static TMP_FontAsset? FindGameFont() => GameFont.Find();
 
         /// <summary>Anchors a rect to the panel's TOP-LEFT and positions it (x right, y down).</summary>
         private static void Place(RectTransform rt, float x, float y, float w, float h)

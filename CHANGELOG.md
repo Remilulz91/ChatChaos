@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.53.0
+- All three HUDs now use the game's own 3270 font (the IBM-3270 pixel font Lethal Company
+  uses everywhere). The Berserk overlay and the effect-timer list were still on Arial; they
+  now match the poll panel. Font is grabbed at runtime via a shared helper (GameFont).
+- Poll panel and text are bigger for readability (wider panel, larger title/instruction/row
+  text and clock/timer).
+- Winner trophy is now gold instead of dark.
+- Fixed the effect-countdown list showing on the main menu: it now hides whenever we're not
+  in a game (no HUD manager), and a dark shadow was added behind it for readability.
+
 ## 0.52.0
 - Winner panel now shows a drawn trophy sprite (cup with handles, stem and base) at the
   right of the winning row, instead of the unsupported emoji. Drawn at runtime like the
