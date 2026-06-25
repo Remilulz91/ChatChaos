@@ -84,6 +84,12 @@ namespace ChatChaos.Events
             EventRegistry.Add("time_frozen", "Time frozen (1m)", "Temps figé (1m)", () =>
                 Core.TimeFreeze.Freeze(60f));
 
+            EventRegistry.Add("clock_slow", "Clock slowed (-25%)", "Horloge ralentie (-25%)", () =>
+                EventActions.SetClockSpeed(0.75f));
+
+            EventRegistry.Add("clock_fast", "Clock accelerated (+25%)", "Horloge accélérée (+25%)", () =>
+                EventActions.SetClockSpeed(1.25f));
+
             EventRegistry.Add("teleport_ship", "Teleport to ship", "Téléporter au vaisseau", () =>
                 EventActions.TeleportAllLivingToShip());
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.55.0
+- Two new events: **Clock slowed (-25%)** and **Clock accelerated (+25%)**. They change
+  the day-clock speed for the rest of the moon; the game resets it when you leave. Applied
+  on every player (host computes the absolute speed so everyone stays in sync).
+
 ## 0.54.0
 - Dropped the planned YouTube integration; the mod stays focused on Twitch. Removed the
   related notes from the README and code comments (no functional change).

@@ -409,6 +409,43 @@ namespace ChatChaos.Networking
         }
 
         /// <summary>
+        /// Multiplies the in-game day-clock speed by <paramref name="factor"/> on every
+        /// machine (0.75 = 25% slower, 1.25 = 25% faster). The host computes the absolute
+        /// target so all machines stay in sync. The game resets the speed by itself when
+        /// the crew leaves the moon, so there is nothing to restore.
+        /// </summary>
+        public void MultiplyTimeSpeed(float factor)
+        {
+            if (!IsServer) return;
+            var tod = TimeOfDay.Instance;
+            if (tod == null) return;
+
+            // Don't compute from a frozen clock (0); fall back to the saved/normal speed.
+            float current = tod.globalTimeSpeedMultiplier;
+            if (current <= 0f) current = _savedTimeMultiplier > 0f ? _savedTimeMultiplier : 1f;
+            float target = current * factor;
+
+            ApplyTimeSpeedLocal(target);
+            Safe(() => SetTimeSpeedClientRpc(target));
+        }
+
+        [ClientRpc]
+        private void SetTimeSpeedClientRpc(float target)
+        {
+            if (IsServer) return;
+            ApplyTimeSpeedLocal(target);
+        }
+
+        private static void ApplyTimeSpeedLocal(float target)
+        {
+            var tod = TimeOfDay.Instance;
+            if (tod == null) return;
+            tod.globalTimeSpeedMultiplier = target;
+            _savedTimeMultiplier = target;   // a later freeze/resume keeps this new speed
+            Plugin.Log.LogInfo($"ChatChaos: clock speed set to x{target:0.###}.");
+        }
+
+        /// <summary>
         /// Teleports every LIVING player back to the ship (from inside the dungeon or
         /// outside). Each machine teleports its own player (the owner), so the position
         /// and room state sync naturally.

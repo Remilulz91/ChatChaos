@@ -55,6 +55,20 @@ namespace ChatChaos.Events
         }
 
         /// <summary>
+        /// Changes the in-game day-clock speed by a factor (0.75 = 25% slower,
+        /// 1.25 = 25% faster). Persists until the crew leaves the moon (the game resets it
+        /// then). Networked to every player.
+        /// </summary>
+        public static void SetClockSpeed(float factor)
+        {
+            var n = ChatChaosNetworker.Active;
+            if (n != null)
+                n.MultiplyTimeSpeed(factor);
+            else
+                Plugin.Log.LogWarning("ChatChaos: clock-speed change skipped (networker not ready).");
+        }
+
+        /// <summary>
         /// Every LIVING player drops all the items they hold. Dead players are not
         /// affected. Networked: each machine drops its own player's items.
         /// </summary>
