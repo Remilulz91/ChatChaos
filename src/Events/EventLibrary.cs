@@ -120,6 +120,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("thanos_snap", "Snap (Thanos)", "Claquement de doigts", () =>
                 EventActions.ThanosSnap());
 
+            EventRegistry.Add("mined_terrain", "Mined terrain", "Terrain miné", () =>
+                EventActions.SpawnMinedTerrain());
+
             EventRegistry.Add("mute_sound", "Mute sound (1m)", "Coupe le son (1m)", () =>
                 Core.SoundMute.Mute(60f));
 

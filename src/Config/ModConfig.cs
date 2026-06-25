@@ -99,6 +99,11 @@ namespace ChatChaos.Config
         /// <summary>Vertical position of the effect-countdown panel (0 = bottom, 1 = top).</summary>
         public static ConfigEntry<float> TimerAnchorY = null!;
 
+        // ---------------- Events ----------------
+
+        /// <summary>How many landmines the "Mined terrain" event spawns across the map.</summary>
+        public static ConfigEntry<int> MinedTerrainCount = null!;
+
         // ---------------- Debug ----------------
 
         /// <summary>Write extra, detailed logs (every vote, every broadcast, etc.).</summary>
@@ -208,6 +213,13 @@ namespace ChatChaos.Config
                 "Display", "TimerPanelAnchorY", 0.55f,
                 "Vertical position of the effect-countdown panel (0 = bottom, 1 = top). " +
                 "Default just above centre.");
+
+            // -- Events --
+            MinedTerrainCount = cfg.Bind(
+                "Events", "MinedTerrainCount", 16,
+                "How many landmines the 'Mined terrain' event scatters across the map " +
+                "(inside + outside). Keep it moderate so players can still move around. " +
+                "Default 16.");
 
             // -- Debug --
             VerboseLogging = cfg.Bind(

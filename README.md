@@ -127,6 +127,7 @@ All options live in `BepInEx/config/Remilulz_91.ChatChaos.cfg`:
 | Display | `PanelAnchorX/Y` | `0.97 / 0.45` | Poll panel position (right side by default). |
 | Display | `PanelScale` | `1.0` | Panel size. |
 | Display | `TimerPanelAnchorX/Y` | `0.015 / 0.55` | Position of the effect-countdown panel (left side by default). |
+| Events | `MinedTerrainCount` | `16` | How many landmines the "Mined terrain" event scatters (inside + outside). |
 | Debug | `VerboseLogging` | `false` | Extra detailed logs (every vote, every broadcast) for debugging. |
 
 ---

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using ChatChaos.Config;
 using ChatChaos.Networking;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace ChatChaos.Events
@@ -215,6 +217,123 @@ namespace ChatChaos.Events
                 n.ExplodeAllMines();
             else
                 Plugin.Log.LogWarning("ChatChaos: explode mines skipped (networker not ready).");
+        }
+
+        /// <summary>
+        /// "Mined terrain": scatters landmines across the whole map (inside the building and
+        /// outside) on AI navigation nodes, snapped to the ground. The count is capped by
+        /// config (<see cref="ModConfig.MinedTerrainCount"/>) so the place stays walkable.
+        /// The host spawns them as NetworkObjects, so they replicate to every player.
+        /// </summary>
+        public static void SpawnMinedTerrain()
+        {
+            var rm = RoundManager.Instance;
+            var sor = StartOfRound.Instance;
+            if (rm == null || sor == null)
+            {
+                Plugin.Log.LogWarning("[ChatChaos][MinedTerrain] RoundManager / StartOfRound not ready.");
+                return;
+            }
+
+            var prefab = FindLandminePrefab();
+            if (prefab == null)
+            {
+                Plugin.Log.LogWarning("[ChatChaos][MinedTerrain] no landmine prefab found in the level data.");
+                return;
+            }
+
+            int total = Mathf.Max(0, ModConfig.MinedTerrainCount.Value);
+            if (total == 0) return;
+
+            // Split the budget between inside and outside so both get mined; if one side
+            // is short on nodes, the other takes the leftover.
+            var inside = ShuffledNodePositions(rm.insideAINodes);
+            var outside = ShuffledNodePositions(rm.outsideAINodes);
+
+            int wantInside = Mathf.Min(total / 2, inside.Count);
+            int wantOutside = Mathf.Min(total - wantInside, outside.Count);
+            wantInside = Mathf.Min(wantInside + (total - wantInside - wantOutside), inside.Count);
+
+            int spawned = SpawnMinesAt(prefab, inside, wantInside)
+                        + SpawnMinesAt(prefab, outside, wantOutside);
+
+            Plugin.Log.LogInfo($"[ChatChaos][MinedTerrain] spawned {spawned} landmine(s) " +
+                               $"(inside up to {wantInside}, outside up to {wantOutside}).");
+        }
+
+        private static int SpawnMinesAt(GameObject prefab, List<Vector3> positions, int count)
+        {
+            int spawned = 0;
+            int mask = LayerMask.GetMask("Room", "Colliders", "Terrain", "Default", "MapHazards");
+            for (int i = 0; i < positions.Count && spawned < count; i++)
+            {
+                Vector3 pos = positions[i];
+                if (Physics.Raycast(pos + Vector3.up * 2f, Vector3.down, out var hit, 8f, mask,
+                                    QueryTriggerInteraction.Ignore))
+                    pos = hit.point;
+                pos += Vector3.up * 0.05f;   // sit just on top of the ground
+                try
+                {
+                    var go = Object.Instantiate(prefab, pos, Quaternion.Euler(0f, Random.Range(0f, 360f), 0f));
+                    var netObj = go.GetComponent<NetworkObject>();
+                    if (netObj == null) { Object.Destroy(go); continue; }
+                    netObj.Spawn(true);
+                    spawned++;
+                }
+                catch (System.Exception ex)
+                {
+                    Plugin.Log.LogError($"[ChatChaos][MinedTerrain] spawn failed: {ex.Message}");
+                }
+            }
+            return spawned;
+        }
+
+        private static List<Vector3> ShuffledNodePositions(GameObject[] nodes)
+        {
+            var list = new List<Vector3>();
+            if (nodes != null)
+                foreach (var nd in nodes)
+                    if (nd != null) list.Add(nd.transform.position);
+
+            for (int i = list.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                (list[i], list[j]) = (list[j], list[i]);
+            }
+            return list;
+        }
+
+        private static GameObject? FindLandminePrefab()
+        {
+            var sor = StartOfRound.Instance;
+            if (sor == null) return null;
+
+            // Prefer the current moon's data, then fall back to any level (the prefab is shared).
+            var fromCur = LandmineIn(sor.currentLevel);
+            if (fromCur != null) return fromCur;
+
+            if (sor.levels != null)
+                foreach (var lvl in sor.levels)
+                {
+                    var p = LandmineIn(lvl);
+                    if (p != null) return p;
+                }
+            return null;
+        }
+
+        private static GameObject? LandmineIn(SelectableLevel? level)
+        {
+            if (level?.spawnableMapObjects == null) return null;
+            try
+            {
+                foreach (var smo in level.spawnableMapObjects)
+                {
+                    var pf = smo.prefabToSpawn;
+                    if (pf != null && pf.GetComponentInChildren<Landmine>() != null) return pf;
+                }
+            }
+            catch { }
+            return null;
         }
 
         /// <summary>

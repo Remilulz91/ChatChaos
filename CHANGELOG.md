@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.57.0
+- New event: **Mined terrain** / "Terrain miné". Scatters landmines across the whole map
+  (inside the building and outside) on navigation nodes, snapped to the ground. The number
+  is capped (config `Events/MinedTerrainCount`, default 16) so the place stays walkable.
+
 ## 0.56.0
 - New event: **Snap (Thanos)** / "Claquement de doigts". Pools every living entity on the
   map — players and enemies, indiscriminately — and kills a random half of the total.
