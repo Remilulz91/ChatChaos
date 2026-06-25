@@ -137,6 +137,30 @@ namespace ChatChaos.Networking
         }
 
         /// <summary>
+        /// Runs a list of host-side actions one at a time, spaced by <paramref name="interval"/>
+        /// seconds, instead of all in the same frame. Used by the "Snap" event so each death
+        /// spawns its ragdoll cleanly (no body gets "swallowed" by a same-frame spawn burst)
+        /// and the frame cost is spread out (less lag).
+        /// </summary>
+        public void RunStaggered(System.Collections.Generic.List<System.Action> actions, float interval)
+        {
+            if (actions == null || actions.Count == 0) return;
+            StartCoroutine(StaggerRoutine(actions, interval));
+        }
+
+        private System.Collections.IEnumerator StaggerRoutine(
+            System.Collections.Generic.List<System.Action> actions, float interval)
+        {
+            var wait = new WaitForSeconds(Mathf.Max(0.01f, interval));
+            foreach (var a in actions)
+            {
+                try { a?.Invoke(); }
+                catch (Exception ex) { Plugin.Log.LogError($"[ChatChaos][Stagger] action failed: {ex.Message}"); }
+                yield return wait;
+            }
+        }
+
+        /// <summary>
         /// Makes every LIVING player drop all the items they hold. Each machine drops its
         /// own player's items (the owner), so the drops sync correctly.
         /// </summary>

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.58.0
+- Snap (Thanos): deaths are now spread out (~0.15s each) instead of all in the same frame.
+  Fixes corpses being "swallowed" (player dead, items on the ground, but no body to revive)
+  and reduces the lag spike from killing many entities at once.
+
 ## 0.57.0
 - New event: **Mined terrain** / "Terrain miné". Scatters landmines across the whole map
   (inside the building and outside) on navigation nodes, snapped to the ground. The number

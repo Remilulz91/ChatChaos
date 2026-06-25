@@ -462,7 +462,8 @@ namespace ChatChaos.Events
                     var enemy = e;   // capture
                     kills.Add(() =>
                     {
-                        try { enemy.KillEnemyOnOwnerClient(true); }
+                        // Re-check: with staggered kills the enemy may have died meanwhile.
+                        try { if (enemy != null && !enemy.isEnemyDead) enemy.KillEnemyOnOwnerClient(true); }
                         catch (System.Exception ex) { Plugin.Log.LogError($"[ChatChaos][Snap] enemy kill failed: {ex.Message}"); }
                     });
                 }
@@ -483,10 +484,18 @@ namespace ChatChaos.Events
             }
 
             int toKill = total / 2;
-            for (int i = 0; i < toKill; i++) kills[i].Invoke();
+            var selected = kills.GetRange(0, toKill);
 
-            Plugin.Log.LogInfo($"[ChatChaos][Snap] snapped {toKill}/{total} living entities " +
-                               $"(players {livingPlayers}, enemies {livingEnemies}).");
+            // Spread the deaths over time (~0.15s each) instead of all in one frame: each
+            // ragdoll then spawns cleanly (no "swallowed" corpse) and the frame cost is
+            // spread out (less lag). Falls back to instant if there's no networker (solo).
+            if (net != null)
+                net.RunStaggered(selected, 0.15f);
+            else
+                foreach (var a in selected) a.Invoke();
+
+            Plugin.Log.LogInfo($"[ChatChaos][Snap] snapping {toKill}/{total} living entities " +
+                               $"over time (players {livingPlayers}, enemies {livingEnemies}).");
         }
 
         /// <summary>Resets the in-game day clock to the morning start. Networked.</summary>
