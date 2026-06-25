@@ -137,6 +137,40 @@ namespace ChatChaos.Networking
         }
 
         /// <summary>
+        /// Kills the player at <paramref name="index"/> WITHOUT spawning a body — the corpse
+        /// is "disintegrated" (Thanos dusting). The player dies and drops their items, but no
+        /// ragdoll is left, so the death is irrecoverable (no body to revive). Same per-owner
+        /// networking as <see cref="KillPlayer"/>.
+        /// </summary>
+        public void DisintegratePlayer(int index)
+        {
+            if (!IsServer) return;
+            DisintegrateIfLocalTarget(index);
+            Safe(() => DisintegratePlayerClientRpc(index));
+        }
+
+        [ClientRpc]
+        private void DisintegratePlayerClientRpc(int index)
+        {
+            if (IsServer) return;
+            DisintegrateIfLocalTarget(index);
+        }
+
+        private static void DisintegrateIfLocalTarget(int index)
+        {
+            var sor = StartOfRound.Instance;
+            if (sor == null || sor.allPlayerScripts == null) return;
+            if (index < 0 || index >= sor.allPlayerScripts.Length) return;
+
+            var target = sor.allPlayerScripts[index];
+            if (target == null) return;
+            if (target != sor.localPlayerController) return;   // only kill your OWN player
+            if (target.isPlayerDead) return;
+
+            target.KillPlayer(Vector3.zero, false, CauseOfDeath.Unknown, 0, default);   // spawnBody: false
+        }
+
+        /// <summary>
         /// Runs a list of host-side actions one at a time, spaced by <paramref name="interval"/>
         /// seconds, instead of all in the same frame. Used by the "Snap" event so each death
         /// spawns its ragdoll cleanly (no body gets "swallowed" by a same-frame spawn burst)

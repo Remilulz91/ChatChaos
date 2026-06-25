@@ -1,9 +1,11 @@
-# Changelog
+## 0.59.0
+- Snap (Thanos): victims are now disintegrated on purpose — players are killed WITHOUT a
+  body (they drop their items but leave no corpse), so the death is irrecoverable, matching
+  the "turned to dust" theme. Other kill events keep leaving a normal body.
 
 ## 0.58.0
-- Snap (Thanos): deaths are now spread out (~0.15s each) instead of all in the same frame.
-  Fixes corpses being "swallowed" (player dead, items on the ground, but no body to revive)
-  and reduces the lag spike from killing many entities at once.
+- Snap (Thanos): deaths are spread out (~0.15s each) instead of all in the same frame, which
+  reduces the lag spike from killing many entities at once (and gives a gradual "dusting").
 
 ## 0.57.0
 - New event: **Mined terrain** / "Terrain miné". Scatters landmines across the whole map

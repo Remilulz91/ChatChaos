@@ -441,12 +441,13 @@ namespace ChatChaos.Events
                     int idx = i;   // capture
                     kills.Add(() =>
                     {
-                        if (net != null) net.KillPlayer(idx);
+                        // Disintegrate: kill WITHOUT a body (Thanos dusting -> irrecoverable).
+                        if (net != null) net.DisintegratePlayer(idx);
                         else
                         {
                             var t = sor.allPlayerScripts[idx];
                             if (t == sor.localPlayerController && !t.isPlayerDead)
-                                t.KillPlayer(Vector3.zero, true, CauseOfDeath.Unknown, 0, default);
+                                t.KillPlayer(Vector3.zero, false, CauseOfDeath.Unknown, 0, default);
                         }
                     });
                 }
