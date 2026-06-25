@@ -296,6 +296,80 @@ namespace ChatChaos.Events
             Plugin.Log.LogInfo($"[ChatChaos][Larvae] replaced {n} indoor enemy(ies) with snare fleas.");
         }
 
+        /// <summary>
+        /// "Thanos snap": pools every living entity on the map — players AND enemies, with
+        /// no distinction — into one set and kills a random half of the total (floored).
+        /// Each kill uses the proper networked path (KillPlayer for players,
+        /// KillEnemyOnOwnerClient for enemies), so it syncs to every machine.
+        /// </summary>
+        public static void ThanosSnap()
+        {
+            var sor = StartOfRound.Instance;
+            var rm = RoundManager.Instance;
+            var net = ChatChaosNetworker.Active;
+
+            // One kill action per living target, mixed together in a single pool.
+            var kills = new List<System.Action>();
+
+            int livingPlayers = 0;
+            if (sor != null && sor.allPlayerScripts != null)
+            {
+                for (int i = 0; i < sor.allPlayerScripts.Length; i++)
+                {
+                    var p = sor.allPlayerScripts[i];
+                    if (p == null || !p.isPlayerControlled || p.isPlayerDead) continue;
+                    livingPlayers++;
+                    int idx = i;   // capture
+                    kills.Add(() =>
+                    {
+                        if (net != null) net.KillPlayer(idx);
+                        else
+                        {
+                            var t = sor.allPlayerScripts[idx];
+                            if (t == sor.localPlayerController && !t.isPlayerDead)
+                                t.KillPlayer(Vector3.zero, true, CauseOfDeath.Unknown, 0, default);
+                        }
+                    });
+                }
+            }
+
+            int livingEnemies = 0;
+            if (rm != null && rm.SpawnedEnemies != null)
+            {
+                foreach (var e in rm.SpawnedEnemies)
+                {
+                    if (e == null || e.isEnemyDead) continue;
+                    livingEnemies++;
+                    var enemy = e;   // capture
+                    kills.Add(() =>
+                    {
+                        try { enemy.KillEnemyOnOwnerClient(true); }
+                        catch (System.Exception ex) { Plugin.Log.LogError($"[ChatChaos][Snap] enemy kill failed: {ex.Message}"); }
+                    });
+                }
+            }
+
+            int total = kills.Count;
+            if (total == 0)
+            {
+                Plugin.Log.LogInfo("[ChatChaos][Snap] no living entity to snap.");
+                return;
+            }
+
+            // Fisher-Yates shuffle, then kill the first half (floored).
+            for (int i = total - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                (kills[i], kills[j]) = (kills[j], kills[i]);
+            }
+
+            int toKill = total / 2;
+            for (int i = 0; i < toKill; i++) kills[i].Invoke();
+
+            Plugin.Log.LogInfo($"[ChatChaos][Snap] snapped {toKill}/{total} living entities " +
+                               $"(players {livingPlayers}, enemies {livingEnemies}).");
+        }
+
         /// <summary>Resets the in-game day clock to the morning start. Networked.</summary>
         public static void ResetToMorning()
         {

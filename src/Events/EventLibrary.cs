@@ -117,6 +117,9 @@ namespace ChatChaos.Events
             EventRegistry.Add("explode_mines", "Detonate all mines", "Exploser toutes les mines", () =>
                 EventActions.ExplodeAllMines());
 
+            EventRegistry.Add("thanos_snap", "Snap (Thanos)", "Claquement de doigts", () =>
+                EventActions.ThanosSnap());
+
             EventRegistry.Add("mute_sound", "Mute sound (1m)", "Coupe le son (1m)", () =>
                 Core.SoundMute.Mute(60f));
 

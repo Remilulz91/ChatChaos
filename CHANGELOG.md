@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.56.0
+- New event: **Snap (Thanos)** / "Claquement de doigts". Pools every living entity on the
+  map — players and enemies, indiscriminately — and kills a random half of the total.
+
 ## 0.55.0
 - Two new events: **Clock slowed (-25%)** and **Clock accelerated (+25%)**. They change
   the day-clock speed for the rest of the moon; the game resets it when you leave. Applied
