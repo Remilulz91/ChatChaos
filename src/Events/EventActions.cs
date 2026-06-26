@@ -250,10 +250,15 @@ namespace ChatChaos.Events
             var placed = new List<Vector3>();
             const float minSpacing = 6f;
 
+            // Mines: inside + outside. Turrets: INSIDE the building only.
             int mines = SpawnHazard(minePrefab, ModConfig.MinedTerrainCount.Value, inside, outside, placed, minSpacing);
-            int turrets = SpawnHazard(turretPrefab, ModConfig.MinedTerrainTurretCount.Value, inside, outside, placed, minSpacing);
 
-            Plugin.Log.LogInfo($"[ChatChaos][MinedTerrain] spawned {mines} landmine(s) and {turrets} turret(s).");
+            int turrets = 0;
+            int turretBudget = Mathf.Max(0, ModConfig.MinedTerrainTurretCount.Value);
+            if (turretPrefab != null && turretBudget > 0)
+                turrets = SpawnHazardsAt(turretPrefab, inside, turretBudget, placed, minSpacing);
+
+            Plugin.Log.LogInfo($"[ChatChaos][MinedTerrain] spawned {mines} landmine(s) and {turrets} turret(s, indoor only).");
         }
 
         /// <summary>Spawns up to <paramref name="total"/> of one hazard, split inside/outside.</summary>

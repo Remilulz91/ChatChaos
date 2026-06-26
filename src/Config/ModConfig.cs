@@ -229,9 +229,9 @@ namespace ChatChaos.Config
 
             MinedTerrainTurretCount = cfg.Bind(
                 "Events", "MinedTerrainTurretCount", 8,
-                "How many turrets the 'Mined terrain' event also scatters across the map " +
-                "(inside + outside). Turrets are deadlier than mines, so keep this lower. " +
-                "Set 0 to spawn mines only. Default 8.");
+                "How many turrets the 'Mined terrain' event also scatters INSIDE the building " +
+                "only (turrets never spawn outside). They are deadlier than mines, so keep this " +
+                "lower. Set 0 to spawn mines only. Default 8.");
 
             SnapSoundDelay = cfg.Bind(
                 "Events", "SnapSoundDelay", 1.5f,
