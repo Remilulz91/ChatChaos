@@ -1,3 +1,8 @@
+## 0.61.0
+- Mined terrain: now also scatters **turrets** across the map (inside + outside), same as the
+  mines, with a separate count (`Events/MinedTerrainTurretCount`, default 8). Mines and
+  turrets are now kept spaced apart (min ~6m) so the place stays playable.
+
 ## 0.60.0
 - Snap (Thanos): now plays a sound first (the finger snap), then disintegrates after a
   short, configurable delay (`Events/SnapSoundDelay`, default 1.5s) so the effect lands on

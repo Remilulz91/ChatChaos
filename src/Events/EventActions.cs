@@ -235,42 +235,62 @@ namespace ChatChaos.Events
                 return;
             }
 
-            var prefab = FindLandminePrefab();
-            if (prefab == null)
+            var minePrefab = FindHazardPrefab<Landmine>();
+            var turretPrefab = FindHazardPrefab<Turret>();
+            if (minePrefab == null && turretPrefab == null)
             {
-                Plugin.Log.LogWarning("[ChatChaos][MinedTerrain] no landmine prefab found in the level data.");
+                Plugin.Log.LogWarning("[ChatChaos][MinedTerrain] no landmine/turret prefab found in the level data.");
                 return;
             }
 
-            int total = Mathf.Max(0, ModConfig.MinedTerrainCount.Value);
-            if (total == 0) return;
-
-            // Split the budget between inside and outside so both get mined; if one side
-            // is short on nodes, the other takes the leftover.
             var inside = ShuffledNodePositions(rm.insideAINodes);
             var outside = ShuffledNodePositions(rm.outsideAINodes);
+
+            // Shared list of everything already placed, so mines AND turrets stay spaced out.
+            var placed = new List<Vector3>();
+            const float minSpacing = 6f;
+
+            int mines = SpawnHazard(minePrefab, ModConfig.MinedTerrainCount.Value, inside, outside, placed, minSpacing);
+            int turrets = SpawnHazard(turretPrefab, ModConfig.MinedTerrainTurretCount.Value, inside, outside, placed, minSpacing);
+
+            Plugin.Log.LogInfo($"[ChatChaos][MinedTerrain] spawned {mines} landmine(s) and {turrets} turret(s).");
+        }
+
+        /// <summary>Spawns up to <paramref name="total"/> of one hazard, split inside/outside.</summary>
+        private static int SpawnHazard(GameObject? prefab, int total, List<Vector3> inside,
+                                       List<Vector3> outside, List<Vector3> placed, float minSpacing)
+        {
+            if (prefab == null) return 0;
+            total = Mathf.Max(0, total);
+            if (total == 0) return 0;
 
             int wantInside = Mathf.Min(total / 2, inside.Count);
             int wantOutside = Mathf.Min(total - wantInside, outside.Count);
             wantInside = Mathf.Min(wantInside + (total - wantInside - wantOutside), inside.Count);
 
-            int spawned = SpawnMinesAt(prefab, inside, wantInside)
-                        + SpawnMinesAt(prefab, outside, wantOutside);
-
-            Plugin.Log.LogInfo($"[ChatChaos][MinedTerrain] spawned {spawned} landmine(s) " +
-                               $"(inside up to {wantInside}, outside up to {wantOutside}).");
+            return SpawnHazardsAt(prefab, inside, wantInside, placed, minSpacing)
+                 + SpawnHazardsAt(prefab, outside, wantOutside, placed, minSpacing);
         }
 
-        private static int SpawnMinesAt(GameObject prefab, List<Vector3> positions, int count)
+        private static int SpawnHazardsAt(GameObject prefab, List<Vector3> positions, int count,
+                                          List<Vector3> placed, float minSpacing)
         {
             int spawned = 0;
             int mask = LayerMask.GetMask("Room", "Colliders", "Terrain", "Default", "MapHazards");
+            float minSq = minSpacing * minSpacing;
             for (int i = 0; i < positions.Count && spawned < count; i++)
             {
                 Vector3 pos = positions[i];
                 if (Physics.Raycast(pos + Vector3.up * 2f, Vector3.down, out var hit, 8f, mask,
                                     QueryTriggerInteraction.Ignore))
                     pos = hit.point;
+
+                // Keep hazards spaced apart so it stays playable.
+                bool tooClose = false;
+                foreach (var p in placed)
+                    if ((p - pos).sqrMagnitude < minSq) { tooClose = true; break; }
+                if (tooClose) continue;
+
                 pos += Vector3.up * 0.05f;   // sit just on top of the ground
                 try
                 {
@@ -278,6 +298,7 @@ namespace ChatChaos.Events
                     var netObj = go.GetComponent<NetworkObject>();
                     if (netObj == null) { Object.Destroy(go); continue; }
                     netObj.Spawn(true);
+                    placed.Add(pos);
                     spawned++;
                 }
                 catch (System.Exception ex)
@@ -303,25 +324,26 @@ namespace ChatChaos.Events
             return list;
         }
 
-        private static GameObject? FindLandminePrefab()
+        /// <summary>Finds a spawnable map-object prefab carrying the component <typeparamref name="T"/>
+        /// (e.g. Landmine or Turret), from the current moon or any level (the prefab is shared).</summary>
+        private static GameObject? FindHazardPrefab<T>() where T : Component
         {
             var sor = StartOfRound.Instance;
             if (sor == null) return null;
 
-            // Prefer the current moon's data, then fall back to any level (the prefab is shared).
-            var fromCur = LandmineIn(sor.currentLevel);
+            var fromCur = HazardIn<T>(sor.currentLevel);
             if (fromCur != null) return fromCur;
 
             if (sor.levels != null)
                 foreach (var lvl in sor.levels)
                 {
-                    var p = LandmineIn(lvl);
+                    var p = HazardIn<T>(lvl);
                     if (p != null) return p;
                 }
             return null;
         }
 
-        private static GameObject? LandmineIn(SelectableLevel? level)
+        private static GameObject? HazardIn<T>(SelectableLevel? level) where T : Component
         {
             if (level?.spawnableMapObjects == null) return null;
             try
@@ -329,7 +351,7 @@ namespace ChatChaos.Events
                 foreach (var smo in level.spawnableMapObjects)
                 {
                     var pf = smo.prefabToSpawn;
-                    if (pf != null && pf.GetComponentInChildren<Landmine>() != null) return pf;
+                    if (pf != null && pf.GetComponentInChildren<T>() != null) return pf;
                 }
             }
             catch { }

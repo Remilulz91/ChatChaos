@@ -104,6 +104,9 @@ namespace ChatChaos.Config
         /// <summary>How many landmines the "Mined terrain" event spawns across the map.</summary>
         public static ConfigEntry<int> MinedTerrainCount = null!;
 
+        /// <summary>How many turrets the "Mined terrain" event spawns across the map.</summary>
+        public static ConfigEntry<int> MinedTerrainTurretCount = null!;
+
         /// <summary>Seconds to wait after the snap sound starts before the disintegration.</summary>
         public static ConfigEntry<float> SnapSoundDelay = null!;
 
@@ -223,6 +226,12 @@ namespace ChatChaos.Config
                 "How many landmines the 'Mined terrain' event scatters across the map " +
                 "(inside + outside). Keep it moderate so players can still move around. " +
                 "Default 16.");
+
+            MinedTerrainTurretCount = cfg.Bind(
+                "Events", "MinedTerrainTurretCount", 8,
+                "How many turrets the 'Mined terrain' event also scatters across the map " +
+                "(inside + outside). Turrets are deadlier than mines, so keep this lower. " +
+                "Set 0 to spawn mines only. Default 8.");
 
             SnapSoundDelay = cfg.Bind(
                 "Events", "SnapSoundDelay", 1.5f,
