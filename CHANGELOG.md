@@ -1,3 +1,9 @@
+## 0.60.0
+- Snap (Thanos): now plays a sound first (the finger snap), then disintegrates after a
+  short, configurable delay (`Events/SnapSoundDelay`, default 1.5s) so the effect lands on
+  the "snap". The audio ships in a `sounds/` folder next to the DLL
+  (`sounds/thanos_snap.mp3|ogg|wav`) and is played for every player.
+
 ## 0.59.0
 - Snap (Thanos): victims are now disintegrated on purpose — players are killed WITHOUT a
   body (they drop their items but leave no corpse), so the death is irrecoverable, matching

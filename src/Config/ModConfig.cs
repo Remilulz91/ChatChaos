@@ -104,6 +104,9 @@ namespace ChatChaos.Config
         /// <summary>How many landmines the "Mined terrain" event spawns across the map.</summary>
         public static ConfigEntry<int> MinedTerrainCount = null!;
 
+        /// <summary>Seconds to wait after the snap sound starts before the disintegration.</summary>
+        public static ConfigEntry<float> SnapSoundDelay = null!;
+
         // ---------------- Debug ----------------
 
         /// <summary>Write extra, detailed logs (every vote, every broadcast, etc.).</summary>
@@ -220,6 +223,12 @@ namespace ChatChaos.Config
                 "How many landmines the 'Mined terrain' event scatters across the map " +
                 "(inside + outside). Keep it moderate so players can still move around. " +
                 "Default 16.");
+
+            SnapSoundDelay = cfg.Bind(
+                "Events", "SnapSoundDelay", 1.5f,
+                "Seconds to wait after the Thanos snap sound starts before the players/enemies " +
+                "are disintegrated, so the effect lands on the 'snap'. Tune it to match your " +
+                "sound file. Default 1.5.");
 
             // -- Debug --
             VerboseLogging = cfg.Bind(

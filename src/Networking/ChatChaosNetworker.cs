@@ -172,19 +172,22 @@ namespace ChatChaos.Networking
 
         /// <summary>
         /// Runs a list of host-side actions one at a time, spaced by <paramref name="interval"/>
-        /// seconds, instead of all in the same frame. Used by the "Snap" event so each death
-        /// spawns its ragdoll cleanly (no body gets "swallowed" by a same-frame spawn burst)
-        /// and the frame cost is spread out (less lag).
+        /// seconds, instead of all in the same frame, after an optional initial delay. Used by
+        /// the "Snap" event: the initial delay lets the snap sound play before the dusting, and
+        /// the spacing spreads the frame cost (less lag) while giving a gradual "dusting".
         /// </summary>
-        public void RunStaggered(System.Collections.Generic.List<System.Action> actions, float interval)
+        public void RunStaggered(System.Collections.Generic.List<System.Action> actions,
+                                 float interval, float initialDelay = 0f)
         {
             if (actions == null || actions.Count == 0) return;
-            StartCoroutine(StaggerRoutine(actions, interval));
+            StartCoroutine(StaggerRoutine(actions, interval, initialDelay));
         }
 
         private System.Collections.IEnumerator StaggerRoutine(
-            System.Collections.Generic.List<System.Action> actions, float interval)
+            System.Collections.Generic.List<System.Action> actions, float interval, float initialDelay)
         {
+            if (initialDelay > 0f) yield return new WaitForSeconds(initialDelay);
+
             var wait = new WaitForSeconds(Mathf.Max(0.01f, interval));
             foreach (var a in actions)
             {
@@ -192,6 +195,24 @@ namespace ChatChaos.Networking
                 catch (Exception ex) { Plugin.Log.LogError($"[ChatChaos][Stagger] action failed: {ex.Message}"); }
                 yield return wait;
             }
+        }
+
+        /// <summary>
+        /// Tells every machine to play the Thanos snap sound at the same moment. Each plays
+        /// its own locally-loaded copy (the audio ships with each player's mod install).
+        /// </summary>
+        public void PlaySnapSound()
+        {
+            if (!IsServer) return;
+            ChatChaos.Core.SnapSound.Instance?.Play();
+            Safe(() => PlaySnapSoundClientRpc());
+        }
+
+        [ClientRpc]
+        private void PlaySnapSoundClientRpc()
+        {
+            if (IsServer) return;
+            ChatChaos.Core.SnapSound.Instance?.Play();
         }
 
         /// <summary>

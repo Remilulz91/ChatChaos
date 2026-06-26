@@ -128,6 +128,7 @@ All options live in `BepInEx/config/Remilulz_91.ChatChaos.cfg`:
 | Display | `PanelScale` | `1.0` | Panel size. |
 | Display | `TimerPanelAnchorX/Y` | `0.015 / 0.55` | Position of the effect-countdown panel (left side by default). |
 | Events | `MinedTerrainCount` | `16` | How many landmines the "Mined terrain" event scatters (inside + outside). |
+| Events | `SnapSoundDelay` | `1.5` | Seconds after the snap sound starts before the disintegration (tune to your audio). |
 | Debug | `VerboseLogging` | `false` | Extra detailed logs (every vote, every broadcast) for debugging. |
 
 ---

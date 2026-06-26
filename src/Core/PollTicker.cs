@@ -31,6 +31,7 @@ namespace ChatChaos.Core
             PollHud.EnsureExists();
             BerserkHud.EnsureExists();
             EffectTimerHud.EnsureExists();
+            SnapSound.EnsureExists();
         }
 
         private void Update()

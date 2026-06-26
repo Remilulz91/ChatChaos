@@ -487,16 +487,23 @@ namespace ChatChaos.Events
             int toKill = total / 2;
             var selected = kills.GetRange(0, toKill);
 
-            // Spread the deaths over time (~0.15s each) instead of all in one frame: each
-            // ragdoll then spawns cleanly (no "swallowed" corpse) and the frame cost is
-            // spread out (less lag). Falls back to instant if there's no networker (solo).
+            // First play the snap sound for everyone, then (after a delay so it lands on the
+            // "snap") disintegrate the victims, spread ~0.15s apart for a gradual dusting and
+            // to spread the frame cost (less lag). Falls back to instant if no networker (solo).
+            float soundDelay = Mathf.Max(0f, ModConfig.SnapSoundDelay.Value);
             if (net != null)
-                net.RunStaggered(selected, 0.15f);
+            {
+                net.PlaySnapSound();
+                net.RunStaggered(selected, 0.15f, soundDelay);
+            }
             else
+            {
+                Core.SnapSound.Instance?.Play();
                 foreach (var a in selected) a.Invoke();
+            }
 
             Plugin.Log.LogInfo($"[ChatChaos][Snap] snapping {toKill}/{total} living entities " +
-                               $"over time (players {livingPlayers}, enemies {livingEnemies}).");
+                               $"(players {livingPlayers}, enemies {livingEnemies}); sound then dusting.");
         }
 
         /// <summary>Resets the in-game day clock to the morning start. Networked.</summary>
